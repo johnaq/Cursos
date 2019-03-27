@@ -1,0 +1,57 @@
+<form method="POST">
+  <div class="form-group row">
+    <label for="idCurso" class="col-sm-2 col-form-label">ID</label>
+    <div class="col-sm-10">
+      <input type="number" required="required" class="form-control" id="idCurso" name="idCurso">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="nombreCurso" class="col-sm-2 col-form-label">Nombre Curso</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="nombreCurso" name="nombreCurso">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="descripcion" class="col-sm-2 col-form-label">Descripción</label>
+    <div class="col-sm-10">
+      <input type="text" required="required" class="form-control" id="descripcion" name="descripcion">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="valor" class="col-sm-2 col-form-label">Valor</label>
+    <div class="col-sm-10">
+      <input type="number" required="required" class="form-control" id="valor" name="valor">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="modalidad" class="col-sm-2 col-form-label">Modalidad</label>
+    <div class="col-sm-10">
+      <select class="form-control" id="modalidad" name="modalidad">
+        <option>Presencial</option>
+        <option>Virtual</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="intendidad" class="col-sm-2 col-form-label">Intensidad horaria</label>
+    <div class="col-sm-10">
+      <input type="number" class="form-control" id="intendidad" name="intensidad">
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-10">
+      <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+  </div>
+</form>
+
+{{#if mensajeExito}}
+<div class="alert alert-success" role="alert">
+  {{mensajeExito}}
+</div>
+{{/if}}
+{{#if mensajeError}}
+  <div class="alert alert-danger" role="alert">
+  {{mensajeError}}
+</div>
+{{/if}}
