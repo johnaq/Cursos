@@ -9,6 +9,7 @@ var flash = require('connect-flash');
 var indexRouter = require('./routes/index');
 var usuariosRouter = require('./routes/usuarios');
 var cursosRouter = require('./routes/cursos');
+var loginRouter = require('./routes/login');
 
 var app = express();
 
@@ -44,6 +45,7 @@ app.use(function(req, res, next){
 app.use('/', indexRouter);
 app.use('/usuarios', usuariosRouter);
 app.use('/cursos', cursosRouter);
+app.use('/login', loginRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
