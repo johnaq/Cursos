@@ -29,7 +29,7 @@ router.post('/nuevo', function(req, res, next) {
     cargarArchivo();
     let buscar = cursos.find(x => x.idCurso == req.body.idCurso);
 
-    if(buscar){
+    if(buscar === undefined){
         let curso = {
             idCurso: req.body.idCurso,
             nombreCurso: req.body.nombreCurso,
@@ -52,7 +52,7 @@ router.post('/nuevo', function(req, res, next) {
 router.get('/:id', function(req, res, next) {
     cargarArchivo();
     let buscar = cursos.find(x => x.idCurso == req.params.id);
-    if(buscar){
+    if(buscar !== undefined){
         res.render('cursos/curso', 
         { 
             title: 'Cursos - ' + buscar.nombreCurso,
