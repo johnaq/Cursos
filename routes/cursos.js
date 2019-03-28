@@ -8,7 +8,19 @@ var cursos = [];
 
 //Lista de cursos para aspirantes y coordinadores
 router.get('/', function(req, res, next) {
+    if(!req.session.usuario){
+        req.flash('mensajeError', 'No tiene permisos')
+        res.redirect('/')
+        return;
+    }
+    let session = req.session.usuario;
     cargarArchivo();
+
+    //Si es rol Aspirante solo se visualizan los cursos activos
+    if(session.rolUsuario == 'Aspirante'){
+        cursos = cursos.filter(x => x.estado == 1)
+    }
+
     console.log(req.session.usuario);
     // console.log(req.session.docUsuario);
     // console.log(req.session.nomUsuario);
