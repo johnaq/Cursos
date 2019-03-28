@@ -14,10 +14,11 @@ router.post('/', function(req, res, next) {
     cargarArchivo();
     // console.log(usuarios);
     
-    let buscar = usuarios.find(x => x.docUsuario == req.body.docLogin);
+    let buscar = usuarios.find(x => x.docUsuario == req.body.docLogin & x.pswUsuario == req.body.pswLogin);
     console.log(buscar);
     if(buscar === undefined){
         req.flash('mensajeError', 'Usuario o contraseña incorrectos')
+        res.redirect('/login')   
     }else{
         // req.flash('mensajeExito', 'Ingreso correcto')
         res.redirect('cursos')        
