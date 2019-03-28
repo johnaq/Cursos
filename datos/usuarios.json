@@ -1,9 +1,1 @@
-[
-    {
-        "documento": 12345,
-        "nombre": "",
-        "correo": "",
-        "telefono": "",
-        "password": ""
-    }
-]
+[{"docUsuario":"1","nombreUsuario":"Jhon Alzate","emailUsuario":"jhon@gmail.com","telUsuario":"3454545","pswUsuario":"12345","pswConfirmaUsuario":"12345","rolUsuario":"Aspirante"},{"docUsuario":"2","nombreUsuario":"eee","emailUsuario":"eeee@g.com","telUsuario":"eeee","pswUsuario":"22","pswConfirmaUsuario":"22","rolUsuario":"Aspirante"}]
