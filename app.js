@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session');
 var flash = require('connect-flash');
+var hbs = require('hbs');
 
 var indexRouter = require('./routes/index');
 var usuariosRouter = require('./routes/usuarios');
@@ -19,8 +20,12 @@ app.use('/css', express.static(dirNode_modules + '/bootstrap/dist/css'));
 app.use('/js', express.static(dirNode_modules + '/jquery/dist'));
 app.use('/js', express.static(dirNode_modules + '/bootstrap/dist/js'));
 
+
+hbs.registerPartials(path.join(__dirname, 'views/partials'))
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
+
 app.set('view engine', 'hbs');
 
 app.use(logger('dev'));
@@ -42,10 +47,10 @@ app.use(function(req, res, next){
   next();
 });
 
-app.use('/', indexRouter);
+app.use('/', loginRouter);
 app.use('/usuarios', usuariosRouter);
 app.use('/cursos', cursosRouter);
-app.use('/login', loginRouter);
+//app.use('/login', loginRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
