@@ -1,21 +1,10 @@
-<form method="POST">
-  <div class="form-group row">
-    <label for="docLogin" class="col-sm-2 col-form-label">Documento de identidad</label>
-    <div class="col-sm-10">
-      <input type="number" required="required" class="form-control" id="docLogin" name="docLogin">
-    </div>
-  </div>
-  <div class="form-group row">
-    <label for="pswLogin" class="col-sm-2 col-form-label">Constraseña</label>
-    <div class="col-sm-10">
-      <input type="password" class="form-control" id="pswLogin" name="pswLogin">
-    </div>
-  </div>
-  <div class="form-group row">
-    <div class="col-sm-10">
-      <button type="submit" class="btn btn-primary">Ingresar</button>
-    </div>
-  </div>
+<form method="POST" class="form-signin">
+  <h1>Sistema de Cursos</h1>
+  <label for="docLogin" class="sr-only">Documento de identidad</label>
+  <input type="number" required="required" class="form-control" id="docLogin" name="docLogin" placeholder="Documento de identidad">
+  <label for="pswLogin" class="sr-only">Constraseña</label>
+  <input type="password" class="form-control" id="pswLogin" name="pswLogin" placeholder="Contraseña">
+  <button type="submit" class="btn btn-primary">Ingresar</button>
 </form>
 
 {{#if mensajeExito}}
@@ -24,7 +13,8 @@
 </div>
 {{/if}}
 {{#if mensajeError}}
-  <div class="alert alert-danger" role="alert">
+<div class="alert alert-danger" role="alert">
   {{mensajeError}}
 </div>
 {{/if}}
+<link rel="stylesheet" href="/css/login.css">
