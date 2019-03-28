@@ -21,8 +21,13 @@ router.post('/', function(req, res, next) {
         res.redirect('/login')   
     }else{
 
-        req.session.docUsuario = buscar.docUsuario;
-        req.session.nomUsuario = buscar.nombreUsuario;        
+        req.session.usuario = buscar;
+        // req.session.docUsuario = buscar.docUsuario;
+        // req.session.nomUsuario = buscar.nombreUsuario; 
+        // req.session.emaUsuario = buscar.emailUsuario; 
+        // req.session.telUsuario = buscar.telUsuario; 
+        // req.session.rolUsuario = buscar.rolUsuario; 
+               
         res.redirect('cursos')        
     }
 });
