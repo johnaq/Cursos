@@ -15,12 +15,14 @@ router.post('/', function(req, res, next) {
     // console.log(usuarios);
     
     let buscar = usuarios.find(x => x.docUsuario == req.body.docLogin & x.pswUsuario == req.body.pswLogin);
-    console.log(buscar);
+    // console.log(buscar);
     if(buscar === undefined){
         req.flash('mensajeError', 'Usuario o contraseña incorrectos')
         res.redirect('/login')   
     }else{
-        // req.flash('mensajeExito', 'Ingreso correcto')
+
+        req.session.docUsuario = buscar.docUsuario;
+        req.session.nomUsuario = buscar.nombreUsuario;        
         res.redirect('cursos')        
     }
 });
