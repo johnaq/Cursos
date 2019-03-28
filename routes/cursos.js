@@ -9,8 +9,12 @@ var cursos = [];
 //Lista de cursos para aspirantes y coordinadores
 router.get('/', function(req, res, next) {
     cargarArchivo();
-    console.log(req.session.docUsuario);
-    console.log(req.session.nomUsuario);
+    console.log(req.session.usuario);
+    // console.log(req.session.docUsuario);
+    // console.log(req.session.nomUsuario);
+    // console.log(req.session.emaUsuario);
+    // console.log(req.session.telUsuario);
+    // console.log(req.session.rolUsuario);
     
     res.render('cursos/index', 
     { 
