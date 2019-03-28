@@ -6,8 +6,15 @@ var router = express.Router();
 const archivo = path.join(__dirname , '../datos/cursos.json');
 var cursos = [];
 
+//Lista de cursos para aspirantes y coordinadores
 router.get('/', function(req, res, next) {
-    res.render('index', { title: 'Cursos' });
+    cargarArchivo();
+
+    res.render('cursos/index', 
+    { 
+        title: 'Cursos',
+        listaCursos: cursos
+    });
 });
 
 /* Nuevo curso */
