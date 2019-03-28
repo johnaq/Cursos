@@ -45,9 +45,9 @@ router.post('/nuevo', function(req, res, next) {
 let cargarArchivo = () => {
     try{
         let data = fs.readFileSync(archivo)
-        cursos = JSON.parse(data)
+        usuarios = JSON.parse(data)
     }catch(error){
-       cursos = [];
+       usuarios = [];
     }
 }
 
