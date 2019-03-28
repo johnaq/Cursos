@@ -9,7 +9,6 @@ var cursos = [];
 //Lista de cursos para aspirantes y coordinadores
 router.get('/', function(req, res, next) {
     cargarArchivo();
-
     res.render('cursos/index', 
     { 
         title: 'Cursos',
@@ -30,7 +29,7 @@ router.post('/nuevo', function(req, res, next) {
     cargarArchivo();
     let buscar = cursos.find(x => x.idCurso == req.body.idCurso);
 
-    if(buscar === undefined){
+    if(buscar){
         let curso = {
             idCurso: req.body.idCurso,
             nombreCurso: req.body.nombreCurso,
@@ -47,6 +46,22 @@ router.post('/nuevo', function(req, res, next) {
         req.flash('mensajeError', 'El curso con ID '+req.body.idCurso+' ya existe')
     }
     res.redirect('/cursos/nuevo')
+});
+
+/* Ver curso */
+router.get('/:id', function(req, res, next) {
+    cargarArchivo();
+    let buscar = cursos.find(x => x.idCurso == req.params.id);
+    if(buscar){
+        res.render('cursos/curso', 
+        { 
+            title: 'Cursos - ' + buscar.nombreCurso,
+            curso: buscar
+        });
+    }else{
+        req
+        res.redirect('/cursos')
+    }
 });
 
 let cargarArchivo = () => {
