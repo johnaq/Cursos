@@ -20,27 +20,23 @@ router.get('/', function(req, res, next) {
     if(session.rolUsuario == 'Aspirante'){
         cursos = cursos.filter(x => x.estado == 1)
     }
-
-    console.log(req.session.usuario);
-    // console.log(req.session.docUsuario);
-    // console.log(req.session.nomUsuario);
-    // console.log(req.session.emaUsuario);
-    // console.log(req.session.telUsuario);
-    // console.log(req.session.rolUsuario);
     
     res.render('cursos/index', 
     { 
         title: 'Cursos',
-        listaCursos: cursos
+        listaCursos: cursos,
+        coordinador: (session.rolUsuario == 'Coordinador') ? true : false  
     });
 });
 
 /* Nuevo curso */
 router.get('/nuevo', function(req, res, next) {
-  res.render('cursos/nuevo',
-  {
-      title: "Crear curso"
-  });
+    let session = req.session.usuario;
+    res.render('cursos/nuevo',
+    {
+        title: "Crear curso",
+        coordinador: (session.rolUsuario == 'Coordinador') ? true : false
+    });
 });
 
 /* Nuevo curso */

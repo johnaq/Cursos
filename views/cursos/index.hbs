@@ -6,15 +6,22 @@
       <th scope="col">Nombre</th>
       <th scope="col">Descripcion</th>
       <th scope="col">Valor</th>
+      {{#if coordinador}}
+      <th scope="col">Estado</th>
+      {{/if}}
       <th scope="col">Opciones</th>
+
     </tr>
   </thead>
   <tbody>
     {{#each listaCursos}}
     <tr>
-      <th scope="row">{{nombreCurso}}</th>
+      <td scope="row">{{nombreCurso}}</td>
       <td>{{descripcion}}</td>
       <td>{{valor}}</td>
+      {{#if ../coordinador}}
+      <td>{{estado}}</td>
+      {{/if}}
       <td><a href="/cursos/{{idCurso}}">Ver mas</a></td>
     </tr>
     {{/each}}

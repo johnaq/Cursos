@@ -18,7 +18,7 @@ router.post('/', function(req, res, next) {
     // console.log(buscar);
     if(buscar === undefined){
         req.flash('mensajeError', 'Usuario o contraseña incorrectos')
-        res.redirect('/login')   
+        res.redirect('/')   
     }else{
 
         req.session.usuario = buscar;
