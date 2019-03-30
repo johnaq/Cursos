@@ -1,12 +1,22 @@
 {{>navbar}}
 
-<h1>{{curso.nombreCurso}}</h1>
-<p>{{curso.descripcion}}</p>
-<p>{{curso.valor}}</p>
-<p>{{curso.modalidad}}</p>
-<p>{{curso.intensidad}}</p>
+<div class="jumbotron">
+  <h1>{{curso.nombreCurso}}</h1>
+  <p>{{curso.descripcion}}</p>
+  <p>{{curso.valor}}</p>
+  <p>{{curso.modalidad}}</p>
+  <p>{{curso.intensidad}}</p>
 
-<a href="/inscripciones/nuevo/{{curso.idCurso}}">Inscribirse</a>
+  {{#if coordinador}}
+    {{#if curso.estado}}
+      <a href="/cursos/desctivar/{{curso.idCurso}}">Desactivar curso</a>
+    {{else}}
+      <a href="/cursos/activar/{{curso.idCurso}}">Activar curso</a>
+    {{/if}}
+  {{else}}
+    <a href="/inscripciones/nuevo/{{curso.idCurso}}">Inscribirse</a>
+  {{/if}}
+</div>
 
 {{#if mensajeExito}}
 <div class="alert alert-success" role="alert">
