@@ -66,12 +66,14 @@ router.post('/nuevo', function(req, res, next) {
 /* Ver curso */
 router.get('/:id', function(req, res, next) {
     cargarArchivo();
+    let session = req.session.usuario;
     let buscar = cursos.find(x => x.idCurso == req.params.id);
     if(buscar !== undefined){
         res.render('cursos/curso', 
         { 
             title: 'Cursos - ' + buscar.nombreCurso,
-            curso: buscar
+            curso: buscar,
+            coordinador: (session.rolUsuario == 'Coordinador') ? true : false
         });
     }else{
         req

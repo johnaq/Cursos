@@ -20,7 +20,13 @@
       <td>{{descripcion}}</td>
       <td>{{valor}}</td>
       {{#if ../coordinador}}
-      <td>{{estado}}</td>
+      <td>
+        {{#if estado}}
+          <span class="badge badge-success">Activo</span>
+        {{else}}
+          <span class="badge badge-secondary">Inactivo</span>
+        {{/if}}
+      </td>
       {{/if}}
       <td><a href="/cursos/{{idCurso}}">Ver mas</a></td>
     </tr>
