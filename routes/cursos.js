@@ -70,7 +70,7 @@ router.get('/estado/:id', function(req, res, next) {
     if(buscar !== undefined){
         buscar['estado'] = (buscar['estado'] == 1) ? 0 : 1;
         guardarArchivo(JSON.stringify(cursos))
-        req.flash('mensajeExito', 'Curso activado con exito')
+        req.flash('mensajeExito', 'Curso activado/desactivado con exito')
         res.redirect(req.get('referer'))
     }else{
         req.flash('mensajeError', 'No se pudo actualizar el curso')
