@@ -25,6 +25,7 @@ router.get('/nuevo/:idCurso', function(req, res, next) {
 
     if(buscar === undefined){
         let inscrito = {
+            id:          session.docUsuario+req.params.idCurso,
             docUsuario:  session.docUsuario,
             idCurso:     req.params.idCurso,
             nombreCurso: curso.nombreCurso,
@@ -69,7 +70,7 @@ router.get('/', function(req, res, next) {
 });
 
 /* Eliminar inscripción*/
-router.get('/eliminar/:idCurso', function(req, res, next) {
+router.get('/eliminar/:id', function(req, res, next) {
 
     if(!req.session.usuario){
         req.flash('mensajeError', 'No tiene permisos')
@@ -79,7 +80,7 @@ router.get('/eliminar/:idCurso', function(req, res, next) {
     let session = req.session.usuario;    
     cargarArchivo();
     //Se buscan los cursos de la persona que se encuentre logueada
-    let buscar = inscripciones.filter(x => x.docUsuario == session.docUsuario & x.idCurso != req.params.idCurso);cargarCursos();             
+    let buscar = inscripciones.filter(x => x.id != req.params.id);cargarCursos();             
     console.log(buscar);
     
     guardarArchivo(JSON.stringify(buscar));
