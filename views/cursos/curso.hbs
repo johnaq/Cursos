@@ -9,9 +9,9 @@
 
   {{#if coordinador}}
     {{#if curso.estado}}
-      <a href="/cursos/desctivar/{{curso.idCurso}}">Desactivar curso</a>
+      <a href="/cursos/estado/{{curso.idCurso}}">Desactivar curso</a>
     {{else}}
-      <a href="/cursos/activar/{{curso.idCurso}}">Activar curso</a>
+      <a href="/cursos/estado/{{curso.idCurso}}">Activar curso</a>
     {{/if}}
   {{else}}
     <a href="/inscripciones/nuevo/{{curso.idCurso}}">Inscribirse</a>
