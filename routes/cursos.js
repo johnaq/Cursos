@@ -25,7 +25,8 @@ router.get('/', function(req, res, next) {
     { 
         title: 'Cursos',
         listaCursos: cursos,
-        coordinador: (session.rolUsuario == 'Coordinador') ? true : false  
+        coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
+        aspirante: (session.rolUsuario == 'Aspirante') ? true : false 
     });
 });
 
@@ -35,7 +36,8 @@ router.get('/nuevo', function(req, res, next) {
     res.render('cursos/nuevo',
     {
         title: "Crear curso",
-        coordinador: (session.rolUsuario == 'Coordinador') ? true : false
+        coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
+        aspirante: (session.rolUsuario == 'Aspirante') ? true : false
     });
 });
 
@@ -88,7 +90,8 @@ router.get('/:id', function(req, res, next) {
         { 
             title: 'Cursos - ' + buscar.nombreCurso,
             curso: buscar,
-            coordinador: (session.rolUsuario == 'Coordinador') ? true : false
+            coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
+            aspirante: (session.rolUsuario == 'Aspirante') ? true : false
         });
     }else{
         res.redirect('/cursos')
