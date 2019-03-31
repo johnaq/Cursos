@@ -68,6 +68,26 @@ router.get('/', function(req, res, next) {
     }
 });
 
+/* Eliminar inscripción*/
+router.get('/eliminar/:idCurso', function(req, res, next) {
+
+    if(!req.session.usuario){
+        req.flash('mensajeError', 'No tiene permisos')
+        res.redirect('/')
+        return;
+    }
+    let session = req.session.usuario;    
+    cargarArchivo();
+    //Se buscan los cursos de la persona que se encuentre logueada
+    let buscar = inscripciones.filter(x => x.docUsuario == session.docUsuario & x.idCurso != req.params.idCurso);cargarCursos();             
+    console.log(buscar);
+    
+    guardarArchivo(JSON.stringify(buscar));
+    req.flash('mensajeExito', 'La inscripción se ha eliminado con éxito.')
+    
+    res.redirect('/inscripciones')
+});
+
 let cargarArchivo = () => {
     try{
         let data = fs.readFileSync(archivo)
