@@ -63,6 +63,21 @@ router.post('/nuevo', function(req, res, next) {
     res.redirect('/cursos/nuevo')
 });
 
+router.get('/estado/:id', function(req, res, next) {
+    cargarArchivo();
+    let session = req.session.usuario;
+    let buscar = cursos.find(x => x.idCurso == req.params.id);
+    if(buscar !== undefined){
+        buscar['estado'] = (buscar['estado'] == 1) ? 0 : 1;
+        guardarArchivo(JSON.stringify(cursos))
+        req.flash('mensajeExito', 'Curso activado con exito')
+        res.redirect(req.get('referer'))
+    }else{
+        req.flash('mensajeError', 'No se pudo actualizar el curso')
+        res.redirect('/cursos')
+    }
+});
+
 /* Ver curso */
 router.get('/:id', function(req, res, next) {
     cargarArchivo();
@@ -76,10 +91,11 @@ router.get('/:id', function(req, res, next) {
             coordinador: (session.rolUsuario == 'Coordinador') ? true : false
         });
     }else{
-        req
         res.redirect('/cursos')
     }
 });
+
+
 
 let cargarArchivo = () => {
     try{
@@ -93,6 +109,7 @@ let cargarArchivo = () => {
 let guardarArchivo = (data) => {
     fs.writeFile(archivo, data, (err) => {
         if (err) throw (err);
+        console.log(err)
         return true;
      });
 }
