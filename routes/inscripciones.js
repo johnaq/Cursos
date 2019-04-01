@@ -9,6 +9,9 @@ var inscripciones = [];
 const archivoCursos = path.join(__dirname , '../datos/cursos.json');
 var cursos = [];
 
+const archivoUsuarios = path.join(__dirname , '../datos/usuarios.json');
+var usuarios = [];
+
 /* Nueva inscripción*/
 router.get('/nuevo/:idCurso', function(req, res, next) {
 
@@ -20,7 +23,8 @@ router.get('/nuevo/:idCurso', function(req, res, next) {
     let session = req.session.usuario;    
     cargarArchivo();
     //Se buscan los cursos de la persona que se encuentre logueada
-    let buscar = inscripciones.find(x => x.docUsuario == session.docUsuario & x.idCurso == req.params.idCurso);cargarCursos();
+    let buscar = inscripciones.find(x => x.docUsuario == session.docUsuario & x.idCurso == req.params.idCurso);
+    cargarCursos();
     let curso = cursos.find(x => x.idCurso == req.params.idCurso);
 
     if(buscar === undefined){
@@ -69,6 +73,45 @@ router.get('/', function(req, res, next) {
     }
 });
 
+router.get('/verinscripciones', function(req, res, next) {
+    let session = req.session.usuario;
+    if(!session.rolUsuario == 'Coordinador'){
+        req.flash('mensajeError', 'No tiene permisos')
+        res.redirect('/cursos')
+        return;
+    }
+
+    let newArray = [];
+
+    cargarCursos();
+    cargarArchivo();
+    cargarUsuarios();
+
+    cursos = cursos.filter(x => x.estado == 1);
+
+    cursos.forEach(function(curso) {
+        let newArray2 = [];
+        let temp = inscripciones.filter(x => x.idCurso == curso.idCurso);
+        temp.forEach(function(i){
+            let temp2 = usuarios.find(u => u.docUsuario == i.docUsuario)
+            i.usuario = temp2;
+            newArray2.push(i);
+        });
+        curso.inscritos = newArray2;
+        newArray.push(curso);
+    });
+
+    console.log(newArray);
+    
+    
+    res.render('inscripciones/verinscripciones', {
+        title: 'Inscripciones',
+        inscripciones: newArray,
+        coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
+        aspirante: (session.rolUsuario == 'Aspirante') ? true : false
+    })
+});
+
 /* Eliminar inscripción*/
 router.get('/eliminar/:id', function(req, res, next) {
 
@@ -86,7 +129,12 @@ router.get('/eliminar/:id', function(req, res, next) {
     guardarArchivo(JSON.stringify(buscar));
     req.flash('mensajeExito', 'La inscripción se ha eliminado con éxito.')
     
-    res.redirect('/inscripciones')
+    if(session.rolUsuario == 'Aspirante'){
+        res.redirect('/inscripciones')
+    }else{
+        res.redirect('/inscripciones/verinscripciones')
+    }
+    
 });
 
 let cargarArchivo = () => {
@@ -112,6 +160,15 @@ let guardarArchivo = (data) => {
         if (err) throw (err);
         return true;
      });
+}
+
+let cargarUsuarios = () => {
+    try{
+        let data = fs.readFileSync(archivoUsuarios)
+        usuarios = JSON.parse(data)
+    }catch(error){
+       usuarios = [];
+    }
 }
 
 module.exports = router;
