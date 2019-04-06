@@ -4,6 +4,7 @@ var fs = require('fs');
 var router = express.Router();
 
 const archivo = path.join(__dirname , '../datos/usuarios.json');
+const Usuario = require('../models/usuarios');
 var usuarios = [];
 
 //Lista de usuarios
@@ -36,26 +37,43 @@ router.get('/nuevo', function(req, res, next) {
 
 /* Nuevo curso */
 router.post('/nuevo', function(req, res, next) {
-    cargarArchivo();
-    let buscar = usuarios.find(x => x.docUsuario == req.body.docUsuario);
 
-    if(buscar === undefined){
-        let usuario = {
+    let usuario = new Usuario ({
             docUsuario:         req.body.docUsuario,
             nombreUsuario:      req.body.nombreUsuario,
             emailUsuario:       req.body.emailUsuario,
             telUsuario:         req.body.telUsuario,
             pswUsuario:         req.body.pswUsuario,
             pswConfirmaUsuario: req.body.pswConfirmaUsuario,
-            rolUsuario:         'Aspirante'
-        };
-        usuarios.push(usuario);
-        guardarArchivo(JSON.stringify(usuarios));
+            rolUsuario:         'Aspirante'    
+    });
+    usuario.save( (err, result) => {
+        if (err) {
+            req.flash('mensajeError', err)
+        }
         req.flash('mensajeExito', 'Usuario creado correctamente')
-    }else{
-        req.flash('mensajeError', 'El usuario con identificación '+req.body.docUsuario+' ya existe')
-    }
-    res.redirect('/usuarios/nuevo')
+        res.redirect('/usuarios/nuevo')
+    })
+    // cargarArchivo();
+    // let buscar = usuarios.find(x => x.docUsuario == req.body.docUsuario);
+
+    // if(buscar === undefined){
+    //     let usuario = {
+    //         docUsuario:         req.body.docUsuario,
+    //         nombreUsuario:      req.body.nombreUsuario,
+    //         emailUsuario:       req.body.emailUsuario,
+    //         telUsuario:         req.body.telUsuario,
+    //         pswUsuario:         req.body.pswUsuario,
+    //         pswConfirmaUsuario: req.body.pswConfirmaUsuario,
+    //         rolUsuario:         'Aspirante'
+    //     };
+    //     usuarios.push(usuario);
+    //     guardarArchivo(JSON.stringify(usuarios));
+    //     req.flash('mensajeExito', 'Usuario creado correctamente')
+    // }else{
+    //     req.flash('mensajeError', 'El usuario con identificación '+req.body.docUsuario+' ya existe')
+    // }
+    // res.redirect('/usuarios/nuevo')
 });
 
 router.post('/editar', function(req, res, next) {
