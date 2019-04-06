@@ -6,6 +6,7 @@ var logger = require('morgan');
 var session = require('express-session');
 var flash = require('connect-flash');
 var hbs = require('hbs');
+var mongoose = require('mongoose');
 
 var indexRouter = require('./routes/index');
 var usuariosRouter = require('./routes/usuarios');
@@ -68,6 +69,13 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+mongoose.connect('mongodb://localhost/Cursos', {useNewUrlParser: true}, (err, result) => {
+  if(err){
+    return console.log(err)
+  }
+  console.log('Conectado')
 });
 
 module.exports = app;
