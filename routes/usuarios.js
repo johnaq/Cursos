@@ -37,43 +37,41 @@ router.get('/nuevo', function(req, res, next) {
 
 /* Nuevo curso */
 router.post('/nuevo', function(req, res, next) {
-
-    let usuario = new Usuario ({
-            docUsuario:         req.body.docUsuario,
-            nombreUsuario:      req.body.nombreUsuario,
-            emailUsuario:       req.body.emailUsuario,
-            telUsuario:         req.body.telUsuario,
-            pswUsuario:         req.body.pswUsuario,
-            pswConfirmaUsuario: req.body.pswConfirmaUsuario,
-            rolUsuario:         'Aspirante'    
-    });
-    usuario.save( (err, result) => {
-        if (err) {
-            req.flash('mensajeError', err)
+    Usuario.find({docUsuario: req.body.docUsuario}).exec((err, result) => {
+        
+        if (err) {            
+            req.flash('mensajeError', err);
+            return res.redirect('/usuarios/nuevo');
         }
-        req.flash('mensajeExito', 'Usuario creado correctamente')
-        res.redirect('/usuarios/nuevo')
-    })
-    // cargarArchivo();
-    // let buscar = usuarios.find(x => x.docUsuario == req.body.docUsuario);
+        
+        if(result.length == 0){
+            let usuario = new Usuario ({
+                docUsuario:         req.body.docUsuario,
+                nombreUsuario:      req.body.nombreUsuario,
+                emailUsuario:       req.body.emailUsuario,
+                telUsuario:         req.body.telUsuario,
+                pswUsuario:         req.body.pswUsuario,
+                pswConfirmaUsuario: req.body.pswConfirmaUsuario,
+                rolUsuario:         'Aspirante'    
+            });
 
-    // if(buscar === undefined){
-    //     let usuario = {
-    //         docUsuario:         req.body.docUsuario,
-    //         nombreUsuario:      req.body.nombreUsuario,
-    //         emailUsuario:       req.body.emailUsuario,
-    //         telUsuario:         req.body.telUsuario,
-    //         pswUsuario:         req.body.pswUsuario,
-    //         pswConfirmaUsuario: req.body.pswConfirmaUsuario,
-    //         rolUsuario:         'Aspirante'
-    //     };
-    //     usuarios.push(usuario);
-    //     guardarArchivo(JSON.stringify(usuarios));
-    //     req.flash('mensajeExito', 'Usuario creado correctamente')
-    // }else{
-    //     req.flash('mensajeError', 'El usuario con identificación '+req.body.docUsuario+' ya existe')
-    // }
-    // res.redirect('/usuarios/nuevo')
+            usuario.save( (err, result) => {
+                if (err) {
+                    req.flash('mensajeError', err);
+                    return res.redirect('/usuarios/nuevo');
+                }
+                req.flash('mensajeExito', 'Usuario creado correctamente');
+                res.redirect('/usuarios/nuevo');
+                           
+            });
+             
+        }else{
+            req.flash('mensajeError', 'El usuario con identificación '+req.body.docUsuario+' ya existe')
+            res.redirect('/usuarios/nuevo');
+        }
+
+    });    
+    
 });
 
 router.post('/editar', function(req, res, next) {
