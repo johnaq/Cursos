@@ -4,6 +4,7 @@
     <span class="navbar-toggler-icon"></span>
   </button>
 
+{{#if session}}
   <div class="collapse navbar-collapse" id="navbarsExampleDefault">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
@@ -23,8 +24,9 @@
       </li>
       {{/if}}
       <li>
-         <a class="nav-link" href="/">Salir</a>
+         <a class="nav-link" href="/salir">Salir</a>
       </li>
     </ul>
   </div>
+  {{/if}}
 </nav>
