@@ -32,4 +32,9 @@ router.post('/', function(req, res, next) {
     });
 });
 
+router.get('/salir', function(req, res, next) {
+    req.session.destroy()
+    res.redirect('/')
+});
+
 module.exports = router;
