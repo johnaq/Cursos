@@ -42,8 +42,11 @@ app.use(session({ cookie: { maxAge: 600000 },
   saveUninitialized: false}));
 app.use(flash());
 
-//mensajes
+//middleware
 app.use(function(req, res, next){
+  //res.locals.coordinador = (session.rolUsuario == 'Coordinador') ? true : false;
+  //res.locals.aspirante = (session.rolUsuario == 'Aspirante') ? true : false;
+  
   res.locals.mensajeExito = req.flash('mensajeExito');
   res.locals.mensajeError = req.flash('mensajeError');
   next();
