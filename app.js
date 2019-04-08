@@ -52,6 +52,18 @@ app.use(function(req, res, next){
   next();
 });
 
+app.use(function(req, res, next){
+  if(req.url != "/" && req.url != "/usuarios/nuevo" && req.url != "/salir"){
+    if(!req.session.usuario){
+      req.flash('mensajeError', 'No tiene permisos')
+      res.redirect('/')
+      return;
+    }
+  }
+  res.locals.session = req.session.usuario;
+  next()
+});
+
 app.use('/', loginRouter);
 app.use('/usuarios', usuariosRouter);
 app.use('/cursos', cursosRouter);
