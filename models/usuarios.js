@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 const usuarioSchema = new Schema({
     docUsuario: {
         type: Number,
-        require: true
+        require: true,
+        unique: true
     },
     nombreUsuario: {
         type: String,
@@ -17,10 +18,6 @@ const usuarioSchema = new Schema({
         type: String
     },
     pswUsuario: {
-        type: String,
-        require: true
-    },
-    pswConfirmaUsuario: {
         type: String,
         require: true
     },
