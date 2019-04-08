@@ -1,11 +1,9 @@
 var express = require('express');
-var path = require('path');
-var fs = require('fs');
+var bcrypt = require('bcryptjs');
 var router = express.Router();
 
-const archivo = path.join(__dirname , '../datos/usuarios.json');
-const Usuario = require('../models/usuarios');
-var usuarios = [];
+const Usuarios = require('../models/usuarios');
+var saltRounds = 10;
 
 //Lista de usuarios
 router.get('/', function(req, res, next) {
@@ -15,15 +13,15 @@ router.get('/', function(req, res, next) {
         res.redirect('/cursos')
         return;
     }
-    
-    cargarArchivo();
-    
-    res.render('usuarios/index', 
-    { 
-        title: 'Usuarios',
-        listaUsuarios: usuarios,
-        coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
-        aspirante: (session.rolUsuario == 'Aspirante') ? true : false 
+
+    Usuarios.find({}).exec((err, result) => {
+        res.render('usuarios/index', 
+        { 
+            title: 'Usuarios',
+            listaUsuarios: result,
+            coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
+            aspirante: (session.rolUsuario == 'Aspirante') ? true : false 
+        });
     });
 });
 
@@ -37,12 +35,13 @@ router.get('/nuevo', function(req, res, next) {
 
 /* Nuevo curso */
 router.post('/nuevo', function(req, res, next) {
-    Usuario.find({docUsuario: req.body.docUsuario}).exec((err, result) => {
-        
+    Usuarios.find({docUsuario: req.body.docUsuario}).exec((err, result) => { 
         if (err) {            
             req.flash('mensajeError', err);
             return res.redirect('/usuarios/nuevo');
         }
+
+        var hashPassword = bcrypt.hashSync(req.body.pswUsuario, saltRounds);
         
         if(result.length == 0){
             let usuario = new Usuario ({
@@ -50,8 +49,7 @@ router.post('/nuevo', function(req, res, next) {
                 nombreUsuario:      req.body.nombreUsuario,
                 emailUsuario:       req.body.emailUsuario,
                 telUsuario:         req.body.telUsuario,
-                pswUsuario:         req.body.pswUsuario,
-                pswConfirmaUsuario: req.body.pswConfirmaUsuario,
+                pswUsuario:         hashPassword,
                 rolUsuario:         'Aspirante'    
             });
 
@@ -71,57 +69,47 @@ router.post('/nuevo', function(req, res, next) {
         }
 
     });    
-    
+
 });
 
 router.post('/editar', function(req, res, next) {
-    cargarArchivo();
-    let session = req.session.usuario;
-    let buscar = usuarios.find(x => x.docUsuario == req.body.docUsuario);
-    if(buscar !== undefined){
-        
-        buscar['nombreUsuario'] = req.body.nombreUsuario;
-        buscar['emailUsuario'] = req.body.emailUsuario;
-        buscar['telUsuario'] = req.body.telUsuario;
-        buscar['rolUsuario'] = (req.body.newRolUsuario == '0') ? buscar.rolUsuario:req.body.newRolUsuario;
-        guardarArchivo(JSON.stringify(usuarios))
-        req.flash('mensajeExito', 'Usuario editado con exito')
-        res.redirect(req.get('referer'))
-    }else{
-        req.flash('mensajeError', 'No se pudo editar el usuario')
-        res.redirect('/usuarios')
-    }
+    Usuarios.updateOne({docUsuario: req.body.docUsuario},
+        {
+            nombreUsuario: req.body.nombreUsuario,
+            emailUsuario: req.body.emailUsuario,
+            telUsuario: req.body.telUsuario,
+            rolUsuario: (req.body.newRolUsuario == '0') ? req.body.rolUsuario : req.body.newRolUsuario
+        }, (err, result) => {
+            var test = result;
+            if(result.ok){
+                req.flash('mensajeExito', 'Usuario editado con exito')
+                res.redirect(req.get('referer'))
+            }else{
+                req.flash('mensajeError', 'Error al actualizar usuario')
+                res.redirect(req.get('referer'))
+            }
+        });
 });
 
 /* editar usuarios */
 router.get('/editar/:docUsuario', function(req, res, next) {
-    cargarArchivo();
     let session = req.session.usuario;
-    let buscar = usuarios.find(x => x.docUsuario == req.params.docUsuario);
+    Usuarios.findOne({docUsuario: req.params.docUsuario}).exec((err, result) => {
+        if (err) {            
+            req.flash('mensajeError', err);
+            return res.redirect('/usuarios');
+        }
 
-    res.render('usuarios/editar', 
-    { 
-        title: 'Editar - ' + buscar.nombreUsuario,
-        usuario: buscar,
-        coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
-        aspirante: (session.rolUsuario == 'Aspirante') ? true : false 
+        if(result){
+            res.render('usuarios/editar', 
+            { 
+                title: 'Editar - ' + result.nombreUsuario,
+                usuario: result,
+                coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
+                aspirante: (session.rolUsuario == 'Aspirante') ? true : false 
+            });
+        }
     });
 });
-
-let cargarArchivo = () => {
-    try{
-        let data = fs.readFileSync(archivo)
-        usuarios = JSON.parse(data)
-    }catch(error){
-       usuarios = [];
-    }
-}
-
-let guardarArchivo = (data) => {
-    fs.writeFile(archivo, data, (err) => {
-        if (err) throw (err);
-        return true;
-     });
-}
 
 module.exports = router;
