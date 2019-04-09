@@ -8,7 +8,6 @@ var flash = require('connect-flash');
 var hbs = require('hbs');
 var mongoose = require('mongoose');
 
-var indexRouter = require('./routes/index');
 var usuariosRouter = require('./routes/usuarios');
 var cursosRouter = require('./routes/cursos');
 var loginRouter = require('./routes/login');
@@ -27,7 +26,6 @@ hbs.registerPartials(path.join(__dirname, 'views/partials'))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-
 app.set('view engine', 'hbs');
 
 app.use(logger('dev'));
@@ -44,13 +42,6 @@ app.use(flash());
 
 //middleware
 app.use(function(req, res, next){
-  
-  res.locals.mensajeExito = req.flash('mensajeExito');
-  res.locals.mensajeError = req.flash('mensajeError');
-  next();
-});
-
-app.use(function(req, res, next){
   if(req.url != "/" && req.url != "/usuarios/nuevo" && req.url != "/salir"){
     if(!req.session.usuario){
       req.flash('mensajeError', 'No tiene permisos')
@@ -63,7 +54,16 @@ app.use(function(req, res, next){
     res.locals.coordinador = (req.session.usuario.rolUsuario == 'Coordinador') ? true : false;
     res.locals.aspirante = (req.session.usuario.rolUsuario == 'Aspirante') ? true : false;
   }
+  res.locals.mensajeExito = req.flash('mensajeExito');
+  res.locals.mensajeError = req.flash('mensajeError');
   next()
+});
+
+//Helper para seleccionar valor por defecto en los select
+hbs.registerHelper('select', function(selected, options) {
+  return options.fn(this).replace(
+      new RegExp(' value=\"' + selected + '\"'),
+      '$& selected="selected"');
 });
 
 app.use('/', loginRouter);
@@ -88,7 +88,8 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-mongoose.connect('mongodb://localhost/Cursos', {useNewUrlParser: true}, (err, result) => {
+mongoose.set('useCreateIndex', true);
+mongoose.connect(process.env.URLDB, {useNewUrlParser: true}, (err, result) => {
   if(err){
     return console.log(err)
   }

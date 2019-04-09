@@ -6,17 +6,7 @@
   <label for="pswLogin" class="sr-only">Constraseña</label>
   <input type="password" class="form-control" id="pswLogin" name="pswLogin" placeholder="Contraseña">
   <button type="submit" class="btn btn-primary">Ingresar</button>
-  <a class="nav-link" href="/usuarios/nuevo" tabindex="-1" aria-disabled="true">Registro</a>
+  <a class="btn btn-primary" href="/usuarios/nuevo" tabindex="-1" aria-disabled="true">Registro</a>
 </form>
 
-{{#if mensajeExito}}
-<div class="alert alert-success" role="alert">
-  {{mensajeExito}}
-</div>
-{{/if}}
-{{#if mensajeError}}
-<div class="alert alert-danger" role="alert">
-  {{mensajeError}}
-</div>
-{{/if}}
 <link rel="stylesheet" href="/css/login.css">

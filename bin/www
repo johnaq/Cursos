@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 
 /**
+ * URL base de datos
+ */
+process.env.URLDB = 'mongodb://localhost:27017/Cursos'
+
+/**
  * Module dependencies.
  */
 
@@ -14,6 +19,8 @@ var http = require('http');
 
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
+
+
 
 /**
  * Create HTTP server.

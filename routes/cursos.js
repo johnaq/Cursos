@@ -49,7 +49,7 @@ router.post('/nuevo', function(req, res, next) {
                 nombreCurso: req.body.nombreCurso,
                 descripcion: req.body.descripcion,
                 valor: req.body.valor,
-                modalidad: req.body.modalidad,
+                modalidad: (req.body.modalidad == "0") ? "" : req.body.modalidad,
                 intensidad: req.body.intensidad,
                 estado: 1
             });
@@ -74,18 +74,17 @@ router.post('/nuevo', function(req, res, next) {
 router.get('/estado/:id', function(req, res, next) {
     Cursos.findOne({idCurso: req.params.id}).exec((err, result) => { 
         Cursos.updateOne({idCurso: req.params.id},
-            {
-                estado: (result.estado == 1) ? 0 : 1
-            }, (err, result) => {
-                var test = result;
-                if(result.ok){
-                    req.flash('mensajeExito', 'Curso activado/desactivado con exito')
-                    res.redirect(req.get('referer'))
-                }else{
-                    req.flash('mensajeError', 'No se pudo actualizar el curso')
-                    res.redirect(req.get('referer'))
-                }
-            });
+        {
+            estado: (result.estado == 1) ? 0 : 1
+        }, (err, result) => {
+            if(result.ok){
+                req.flash('mensajeExito', 'Curso activado/desactivado con exito')
+                res.redirect(req.get('referer'))
+            }else{
+                req.flash('mensajeError', 'No se pudo actualizar el curso')
+                res.redirect(req.get('referer'))
+            }
+        });
     });
 });
 

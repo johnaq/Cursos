@@ -40,17 +40,7 @@
   <div class="form-group row">
     <div class="col-sm-12">
       <button type="submit" class="btn btn-primary">Guardar</button>
+      <a class="btn btn-primary" href="/" tabindex="-1" aria-disabled="true">Salir</a>
     </div>
   </div>
 </form>
-
-{{#if mensajeExito}}
-<div class="alert alert-success" role="alert">
-  {{mensajeExito}}
-</div>
-{{/if}}
-{{#if mensajeError}}
-  <div class="alert alert-danger" role="alert">
-  {{mensajeError}}
-</div>
-{{/if}}
