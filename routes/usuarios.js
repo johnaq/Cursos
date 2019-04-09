@@ -18,9 +18,7 @@ router.get('/', function(req, res, next) {
         res.render('usuarios/index', 
         { 
             title: 'Usuarios',
-            listaUsuarios: result,
-            coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
-            aspirante: (session.rolUsuario == 'Aspirante') ? true : false 
+            listaUsuarios: result
         });
     });
 });
@@ -33,7 +31,7 @@ router.get('/nuevo', function(req, res, next) {
   });
 });
 
-/* Nuevo curso */
+/* Nuevo Usuario */
 router.post('/nuevo', function(req, res, next) {
     Usuarios.find({docUsuario: req.body.docUsuario}).exec((err, result) => { 
         if (err) {            
@@ -44,7 +42,7 @@ router.post('/nuevo', function(req, res, next) {
         var hashPassword = bcrypt.hashSync(req.body.pswUsuario, saltRounds);
         
         if(result.length == 0){
-            let usuario = new Usuario ({
+            let usuario = new Usuarios ({
                 docUsuario:         req.body.docUsuario,
                 nombreUsuario:      req.body.nombreUsuario,
                 emailUsuario:       req.body.emailUsuario,
@@ -74,26 +72,25 @@ router.post('/nuevo', function(req, res, next) {
 
 router.post('/editar', function(req, res, next) {
     Usuarios.updateOne({docUsuario: req.body.docUsuario},
-        {
-            nombreUsuario: req.body.nombreUsuario,
-            emailUsuario: req.body.emailUsuario,
-            telUsuario: req.body.telUsuario,
-            rolUsuario: (req.body.newRolUsuario == '0') ? req.body.rolUsuario : req.body.newRolUsuario
-        }, (err, result) => {
-            var test = result;
-            if(result.ok){
-                req.flash('mensajeExito', 'Usuario editado con exito')
-                res.redirect(req.get('referer'))
-            }else{
-                req.flash('mensajeError', 'Error al actualizar usuario')
-                res.redirect(req.get('referer'))
-            }
-        });
+    {
+        nombreUsuario: req.body.nombreUsuario,
+        emailUsuario: req.body.emailUsuario,
+        telUsuario: req.body.telUsuario,
+        rolUsuario: (req.body.newRolUsuario == '0') ? req.body.rolUsuario : req.body.newRolUsuario
+    }, (err, result) => {
+        var test = result;
+        if(result.ok){
+            req.flash('mensajeExito', 'Usuario editado con exito')
+            res.redirect(req.get('referer'))
+        }else{
+            req.flash('mensajeError', 'Error al actualizar usuario')
+            res.redirect(req.get('referer'))
+        }
+    });
 });
 
 /* editar usuarios */
 router.get('/editar/:docUsuario', function(req, res, next) {
-    let session = req.session.usuario;
     Usuarios.findOne({docUsuario: req.params.docUsuario}).exec((err, result) => {
         if (err) {            
             req.flash('mensajeError', err);
@@ -104,9 +101,7 @@ router.get('/editar/:docUsuario', function(req, res, next) {
             res.render('usuarios/editar', 
             { 
                 title: 'Editar - ' + result.nombreUsuario,
-                usuario: result,
-                coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
-                aspirante: (session.rolUsuario == 'Aspirante') ? true : false 
+                usuario: result
             });
         }
     });
