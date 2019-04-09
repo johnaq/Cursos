@@ -12,6 +12,21 @@
     <main role="main" class="container">
       <div class="contenido"></div>
       {{{body}}}
+
+       <div class="row">
+        <div class="col">
+          {{#if mensajeExito}}
+          <div class="alert alert-success" role="alert">
+            {{mensajeExito}}
+          </div>
+          {{/if}}
+          {{#if mensajeError}}
+          <div class="alert alert-danger" role="alert">
+            {{mensajeError}}
+          </div>
+          {{/if}}
+          </div>
+        </div>
     </main>
 	  <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>

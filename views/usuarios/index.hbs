@@ -15,18 +15,7 @@
       <td scope="row">{{docUsuario}}</td>
       <td>{{nombreUsuario}}</td>
       <td>{{emailUsuario}}</td>      
-      <td><a href="/usuarios/editar/{{docUsuario}}">Editar</a></td>
+      <td><a class="btn btn-info" href="/usuarios/editar/{{docUsuario}}">Editar</a></td>
     </tr>
     {{/each}}
 </table>
-
-{{#if mensajeExito}}
-<div class="alert alert-success" role="alert">
-  {{mensajeExito}}
-</div>
-{{/if}}
-{{#if mensajeError}}
-  <div class="alert alert-danger" role="alert">
-  {{mensajeError}}
-</div>
-{{/if}}

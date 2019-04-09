@@ -4,7 +4,7 @@
   <div class="card">
     <div class="card-header" id="heading{{idCurso}}">
       <h2 class="mb-0">
-        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{idCurso}}" aria-expanded="true" aria-controls="collapse{{idCurso}}">
+        <button class="btn btn-dark btn-lg btn-block" type="button" data-toggle="collapse" data-target="#collapse{{idCurso}}" aria-expanded="true" aria-controls="collapse{{idCurso}}">
           {{nombreCurso}}
         </button>
       </h2>
@@ -33,16 +33,3 @@
   </div>
   {{/each}}
 </div>
-
-{{#if mensajeExito}}
-<div class="alert alert-success" role="alert">
-  {{mensajeExito}}
-</div>
-{{/if}}
-{{#if mensajeError}}
-<div class="alert alert-danger" role="alert">
-  {{mensajeError}}
-</div>
-{{/if}}
-
-
