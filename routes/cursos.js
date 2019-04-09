@@ -1,9 +1,7 @@
 var express = require('express');
-var fs = require('fs');
 var router = express.Router();
 
 const Cursos = require('../models/cursos');
-var cursos = [];
 
 //Lista de cursos para aspirantes y coordinadores
 router.get('/', function(req, res, next) {
@@ -108,24 +106,5 @@ router.get('/:id', function(req, res, next) {
         }
     });
 });
-
-
-
-let cargarArchivo = () => {
-    try{
-        let data = fs.readFileSync(archivo)
-        cursos = JSON.parse(data)
-    }catch(error){
-       cursos = [];
-    }
-}
-
-let guardarArchivo = (data) => {
-    fs.writeFile(archivo, data, (err) => {
-        if (err) throw (err);
-        console.log(err)
-        return true;
-     });
-}
 
 module.exports = router;
