@@ -44,8 +44,6 @@ app.use(flash());
 
 //middleware
 app.use(function(req, res, next){
-  //res.locals.coordinador = (session.rolUsuario == 'Coordinador') ? true : false;
-  //res.locals.aspirante = (session.rolUsuario == 'Aspirante') ? true : false;
   
   res.locals.mensajeExito = req.flash('mensajeExito');
   res.locals.mensajeError = req.flash('mensajeError');
@@ -60,7 +58,11 @@ app.use(function(req, res, next){
       return;
     }
   }
-  res.locals.session = req.session.usuario;
+  if(req.session.usuario){
+    res.locals.session = true;
+    res.locals.coordinador = (req.session.usuario.rolUsuario == 'Coordinador') ? true : false;
+    res.locals.aspirante = (req.session.usuario.rolUsuario == 'Aspirante') ? true : false;
+  }
   next()
 });
 
