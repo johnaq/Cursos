@@ -22,8 +22,8 @@
         <tbody>
             {{#each inscripciones}}
             <tr>
-            <td scope="row">{{idUsuario.docUsuario}}</td>
-            <td>{{idUsuario.nombreUsuario}}</td>
+            <td scope="row">{{docUsuario}}</td>
+            <td>{{nombreUsuario}}</td>
             <td><a class="btn btn-danger" href="/inscripciones/eliminar/{{docUsuario}}{{../idCurso}}" role="button">Eliminar</a></td>
             </tr>
             {{/each}}
@@ -33,3 +33,4 @@
   </div>
   {{/each}}
 </div>
+{{inscripciones}}
