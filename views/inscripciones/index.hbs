@@ -10,12 +10,13 @@
     </tr>
   </thead>
   <tbody>
-    {{#each inscripcion}}
+    
+    {{#each inscripciones}}
     <tr>
-      <td scope="row">{{nombreCurso}}</td>
-      <td>{{descripcion}}</td>
-      <td>{{valor}}</td>
-      <td><a class="btn btn-danger" href="/inscripciones/eliminar/{{id}}" role="button">Eliminar</a></td>
+      <td scope="row">{{idCurso.nombreCurso}}</td>
+      <td>{{idCurso.descripcion}}</td>
+      <td>{{idCurso.valor}}</td>
+      <td><a class="btn btn-danger" href="/inscripciones/eliminar/{{_id}}" role="button">Eliminar</a></td>
     </tr>
     {{/each}}
 </table>

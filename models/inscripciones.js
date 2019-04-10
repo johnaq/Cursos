@@ -4,11 +4,11 @@ const Schema = mongoose.Schema;
 const inscripcionSchema = new Schema({
     idUsuario: {
         type: Schema.ObjectId,
-        ref: 'usuarios',
+        ref: 'Usuario',
     },
     idCurso: {
         type: Schema.ObjectId,
-        ref: 'cursos'
+        ref: 'Curso'
     }
 });
 
