@@ -3,113 +3,146 @@ var path = require('path');
 var fs = require('fs');
 var router = express.Router();
 
-const archivo = path.join(__dirname , '../datos/inscripciones.json');
-var inscripciones = [];
-
-const archivoCursos = path.join(__dirname , '../datos/cursos.json');
-var cursos = [];
-
-const archivoUsuarios = path.join(__dirname , '../datos/usuarios.json');
-var usuarios = [];
+const Inscripciones = require('../models/inscripciones');
+const Usuarios = require('../models/usuarios');
+const Cursos = require('../models/cursos');
 
 /* Nueva inscripción*/
 router.get('/nuevo/:idCurso', function(req, res, next) {
 
-    if(!req.session.usuario){
-        req.flash('mensajeError', 'No tiene permisos')
-        res.redirect('/')
-        return;
-    }
-    let session = req.session.usuario;    
-    cargarArchivo();
-    //Se buscan los cursos de la persona que se encuentre logueada
-    let buscar = inscripciones.find(x => x.docUsuario == session.docUsuario & x.idCurso == req.params.idCurso);
-    cargarCursos();
-    let curso = cursos.find(x => x.idCurso == req.params.idCurso);
+    let session = req.session.usuario
+    let inscripcion = new Inscripciones ({
+        idCurso: req.params.idCurso,
+        idUsuario:  session._id,
+    });
+    
+    inscripcion.save( (err, result) => {
+        if (err) {
+            req.flash('mensajeError', err);
+            return res.redirect('/inscripciones');
+        }
+        req.flash('mensajeExito', 'Curso creado correctamente'); 
+        res.redirect('/inscripciones')                  
+    });
+    
 
-    if(buscar === undefined){
-        let inscrito = {
-            id:          session.docUsuario+req.params.idCurso,
-            docUsuario:  session.docUsuario,
-            idCurso:     req.params.idCurso,
-            nombreCurso: curso.nombreCurso,
-            descripcion: curso.descripcion,
-            valor:       curso.valor,
-            modalidad:   curso.modalidad,
-            intensidad:  curso.intensidad
-        };
+    // let session = req.session.usuario;    
+    // cargarArchivo();
+    // //Se buscan los cursos de la persona que se encuentre logueada
+    // let buscar = inscripciones.find(x => x.docUsuario == session.docUsuario & x.idCurso == req.params.idCurso);
+    // cargarCursos();
+    // let curso = cursos.find(x => x.idCurso == req.params.idCurso);
+
+    // if(buscar === undefined){
+    //     let inscrito = {
+    //         id:          session.docUsuario+req.params.idCurso,
+    //         docUsuario:  session.docUsuario,
+    //         idCurso:     req.params.idCurso,
+    //         nombreCurso: curso.nombreCurso,
+    //         descripcion: curso.descripcion,
+    //         valor:       curso.valor,
+    //         modalidad:   curso.modalidad,
+    //         intensidad:  curso.intensidad
+    //     };
              
-        inscripciones.push(inscrito);
-        guardarArchivo(JSON.stringify(inscripciones));
-        req.flash('mensajeExito', 'La inscripción se ha realizado correctamente para el curso '+ curso.nombreCurso)
-    }else{
-        req.flash('mensajeError', 'Ya se encuentra inscrito en el curso ' + curso.nombreCurso)
-    }
-    res.redirect('/inscripciones')
+    //     inscripciones.push(inscrito);
+    //     guardarArchivo(JSON.stringify(inscripciones));
+    //     req.flash('mensajeExito', 'La inscripción se ha realizado correctamente para el curso '+ curso.nombreCurso)
+    // }else{
+    //     req.flash('mensajeError', 'Ya se encuentra inscrito en el curso ' + curso.nombreCurso)
+    // }
+    // res.redirect('/inscripciones')
 });
 
 /* Ver inscripciones */
 router.get('/', function(req, res, next) {
-    if(!req.session.usuario){
-        req.flash('mensajeError', 'No tiene permisos')
-        res.redirect('/')
-        return;
-    }
-    let session = req.session.usuario;
-    cargarArchivo();
-    let buscar = inscripciones.filter(x => x.docUsuario == session.docUsuario);
-    // console.log(buscar);    
-    if(buscar !== undefined){
-        res.render('inscripciones/index',
-        { 
-            title: 'Inscripciones - ' + session.nombreUsuario,
-            inscripcion: buscar,
-            coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
-            aspirante: (session.rolUsuario == 'Aspirante') ? true : false
-        });
-    }else{
+
+    // Inscripciones.find({}).exec((err, result) => {
         
-        res.redirect('/cursos')
-    }
-});
+    //     Usuarios.populate(result, {path: 'idUsuario'}, (err, usuario) => {
 
-router.get('/verinscripciones', function(req, res, next) {
-    let session = req.session.usuario;
-    if(!session.rolUsuario == 'Coordinador'){
-        req.flash('mensajeError', 'No tiene permisos')
-        res.redirect('/cursos')
-        return;
-    }
+    //         Cursos.populate(result, {path: 'idUsuario'}, (err, usuario) => {
 
-    let newArray = [];
+    //     });
 
-    cargarCursos();
-    cargarArchivo();
-    cargarUsuarios();
+    // });
 
-    cursos = cursos.filter(x => x.estado == 1);
 
-    cursos.forEach(function(curso) {
-        let newArray2 = [];
-        let temp = inscripciones.filter(x => x.idCurso == curso.idCurso);
-        temp.forEach(function(i){
-            let temp2 = usuarios.find(u => u.docUsuario == i.docUsuario)
-            i.usuario = temp2;
-            newArray2.push(i);
-        });
-        curso.inscritos = newArray2;
-        newArray.push(curso);
-    });
+    Inscripciones.find({}).populate('idCurso').exec((err, inscripcion) => {
+		if(err){
+			res.status(500).send({message:'Error de conexión a la BD'});
+		}else{
+			if(!inscripcion){
+				res.status(404).send({message: 'No existe el curso'});
+			}else{
+				Usuarios.populate(inscripcion,'idUsuario', (err, idUsuario) => {
+					
+					if(err){
+						res.status(500).send({message: 'Error en la peticiona la BD'});
+					}else{
+						res.status(200).send(idUsuario);
+					}
+				});
+			}
+		}
+	});
 
-    console.log(newArray);
+
+
+    
+//     let session = req.session.usuario;
+//     cargarArchivo();
+//     let buscar = inscripciones.filter(x => x.docUsuario == session.docUsuario);
+//     // console.log(buscar);    
+//     if(buscar !== undefined){
+//         res.render('inscripciones/index',
+//         { 
+//             title: 'Inscripciones - ' + session.nombreUsuario,
+//             inscripcion: buscar,
+//             coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
+//             aspirante: (session.rolUsuario == 'Aspirante') ? true : false
+//         });
+//     }else{
+        
+//         res.redirect('/cursos')
+//     }
+// });
+
+// router.get('/verinscripciones', function(req, res, next) {
+//     let session = req.session.usuario;
+//     if(!session.rolUsuario == 'Coordinador'){
+//         req.flash('mensajeError', 'No tiene permisos')
+//         res.redirect('/cursos')
+//         return;
+//     }
+
+//     let newArray = [];
+
+//     cargarCursos();
+//     cargarArchivo();
+//     cargarUsuarios();
+
+//     cursos = cursos.filter(x => x.estado == 1);
+
+//     cursos.forEach(function(curso) {
+//         let newArray2 = [];
+//         let temp = inscripciones.filter(x => x.idCurso == curso.idCurso);
+//         temp.forEach(function(i){
+//             let temp2 = usuarios.find(u => u.docUsuario == i.docUsuario)
+//             i.usuario = temp2;
+//             newArray2.push(i);
+//         });
+//         curso.inscritos = newArray2;
+//         newArray.push(curso);
+//     });
+
+//     console.log(newArray);
     
     
-    res.render('inscripciones/verinscripciones', {
-        title: 'Inscripciones',
-        inscripciones: newArray,
-        coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
-        aspirante: (session.rolUsuario == 'Aspirante') ? true : false
-    })
+    // res.render('inscripciones/verinscripciones', {
+    //     title: 'Inscripciones',
+    //     inscripciones: newArray
+    // })
 });
 
 /* Eliminar inscripción*/
