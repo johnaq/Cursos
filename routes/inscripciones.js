@@ -77,62 +77,70 @@ router.get('/verinscripciones', function(req, res, next) {
     // });
 
     //TODO: Terminar
+    var listInsc = [];
+    var verInsc = [];
     Cursos.find({estado: 1}).exec((err, result) => {
-
-        result.forEach(curso => {
+        listInsc = result;
+        listInsc.forEach(curso => {
             console.log(curso)
-            Inscripciones.find({idCurso: new ObjectId(curso.id)}).populate('idUsuario').exec((err, inscripcion) => {
-                curso['inscripciones'].push(inscripcion);
+            curso['inscripciones'] = [];
+            Inscripciones.find({idCurso: curso.id}).populate('idUsuario').exec((err, inscripcion) => {
                 console.log(inscripcion);
+                inscripcion.forEach(element => {
+                    curso['inscripciones'].push(element.idUsuario);
+                }); 
+                verInsc.push(curso);
+                console.log(verInsc);               
             });
 
-            //console.log(JSON.stringify(result));
+            // console.log(JSON.stringify(curso));
+            // verInsc.push(curso);
         });
-        res.render('cursos/index', 
-        { 
-            title: 'Cursos',
-            listaCursos: result
-        });
+        // console.log(JSON.stringify(curso));
+        
     });
 
-
-
-
-
-    let session = req.session.usuario;
-    if(!session.rolUsuario == 'Coordinador'){
-        req.flash('mensajeError', 'No tiene permisos')
-        res.redirect('/cursos')
-        return;
-    }
-
-    let newArray = [];
-
-    cargarCursos();
-    cargarArchivo();
-    cargarUsuarios();
-
-    cursos = cursos.filter(x => x.estado == 1);
-
-    cursos.forEach(function(curso) {
-        let newArray2 = [];
-        let temp = inscripciones.filter(x => x.idCurso == curso.idCurso);
-        temp.forEach(function(i){
-            let temp2 = usuarios.find(u => u.docUsuario == i.docUsuario)
-            i.usuario = temp2;
-            newArray2.push(i);
-        });
-        curso.inscritos = newArray2;
-        newArray.push(curso);
-    });
-
-    console.log(newArray);
-    
-    
     res.render('inscripciones/verinscripciones', {
         title: 'Inscripciones',
-        inscripciones: newArray
+        inscripciones: verInsc
     })
+
+
+
+    // let session = req.session.usuario;
+    // if(!session.rolUsuario == 'Coordinador'){
+    //     req.flash('mensajeError', 'No tiene permisos')
+    //     res.redirect('/cursos')
+    //     return;
+    // }
+
+    // let newArray = [];
+
+    // cargarCursos();
+    // cargarArchivo();
+    // cargarUsuarios();
+
+    // cursos = cursos.filter(x => x.estado == 1);
+
+    // cursos.forEach(function(curso) {
+    //     let newArray2 = [];
+    //     let temp = inscripciones.filter(x => x.idCurso == curso.idCurso);
+    //     temp.forEach(function(i){
+    //         let temp2 = usuarios.find(u => u.docUsuario == i.docUsuario)
+    //         i.usuario = temp2;
+    //         newArray2.push(i);
+    //     });
+    //     curso.inscritos = newArray2;
+    //     newArray.push(curso);
+    // });
+
+    // console.log(newArray);
+    
+    
+    // res.render('inscripciones/verinscripciones', {
+    //     title: 'Inscripciones',
+    //     inscripciones: newArray
+    // })
 });
 
 /* Eliminar inscripción*/

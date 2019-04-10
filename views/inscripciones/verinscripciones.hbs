@@ -20,10 +20,10 @@
             </tr>
         </thead>
         <tbody>
-            {{#each inscritos}}
+            {{#each inscripciones}}
             <tr>
-            <td scope="row">{{usuario.docUsuario}}</td>
-            <td>{{usuario.nombreUsuario}}</td>
+            <td scope="row">{{idUsuario.docUsuario}}</td>
+            <td>{{idUsuario.nombreUsuario}}</td>
             <td><a class="btn btn-danger" href="/inscripciones/eliminar/{{docUsuario}}{{../idCurso}}" role="button">Eliminar</a></td>
             </tr>
             {{/each}}
