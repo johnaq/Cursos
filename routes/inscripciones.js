@@ -1,8 +1,5 @@
 var express = require('express');
-var path = require('path');
-var fs = require('fs');
 var router = express.Router();
-var ObjectId = require('mongoose').Types.ObjectId; 
 
 const Inscripciones = require('../models/inscripciones');
 const Usuarios = require('../models/usuarios');
@@ -25,34 +22,6 @@ router.get('/nuevo/:idCurso', function(req, res, next) {
         req.flash('mensajeExito', 'Curso creado correctamente'); 
         res.redirect('/inscripciones')                  
     });
-    
-
-    // let session = req.session.usuario;    
-    // cargarArchivo();
-    // //Se buscan los cursos de la persona que se encuentre logueada
-    // let buscar = inscripciones.find(x => x.docUsuario == session.docUsuario & x.idCurso == req.params.idCurso);
-    // cargarCursos();
-    // let curso = cursos.find(x => x.idCurso == req.params.idCurso);
-
-    // if(buscar === undefined){
-    //     let inscrito = {
-    //         id:          session.docUsuario+req.params.idCurso,
-    //         docUsuario:  session.docUsuario,
-    //         idCurso:     req.params.idCurso,
-    //         nombreCurso: curso.nombreCurso,
-    //         descripcion: curso.descripcion,
-    //         valor:       curso.valor,
-    //         modalidad:   curso.modalidad,
-    //         intensidad:  curso.intensidad
-    //     };
-             
-    //     inscripciones.push(inscrito);
-    //     guardarArchivo(JSON.stringify(inscripciones));
-    //     req.flash('mensajeExito', 'La inscripción se ha realizado correctamente para el curso '+ curso.nombreCurso)
-    // }else{
-    //     req.flash('mensajeError', 'Ya se encuentra inscrito en el curso ' + curso.nombreCurso)
-    // }
-    // res.redirect('/inscripciones')
 });
 
 /* Ver inscripciones */
@@ -67,39 +36,21 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/verinscripciones', function(req, res, next) {
-
-
-    // Inscripciones.find({}).populate('idCurso').populate('idUsuario').exec((err,inscripciones) => {
-    //     res.render('inscripciones/index', {
-    //         title: 'Inscripciones',
-    //         inscripciones: inscripciones
-    //     })
-    // });
-
-    //TODO: Terminar
     var listInsc = [];
     var verInsc = [];
     Cursos.find({estado: 1}).exec((err, result) => {
         listInsc = result;
         listInsc.forEach(curso => {
-            // console.log(curso)
             curso['inscripciones'] = [];
-            // curso['idInscripcion'] = [];
             Inscripciones.find({idCurso: curso.id}).populate('idUsuario').exec((err, inscripcion) => {
-                // console.log(inscripcion);
                 inscripcion.forEach(element => {
                     element.idUsuario['idInscripcion'] = element.id;
                     curso['inscripciones'].push(element.idUsuario);
-                    // curso['idInscripcion'].push(element.id);
                 }); 
                 verInsc.push(curso);
                 console.log(verInsc);               
             });
-
-            // console.log(JSON.stringify(curso));
-            // verInsc.push(curso);
         });
-        // console.log(JSON.stringify(curso));
         
     });
 
@@ -107,43 +58,6 @@ router.get('/verinscripciones', function(req, res, next) {
         title: 'Inscripciones',
         inscripciones: verInsc
     })
-
-
-
-    // let session = req.session.usuario;
-    // if(!session.rolUsuario == 'Coordinador'){
-    //     req.flash('mensajeError', 'No tiene permisos')
-    //     res.redirect('/cursos')
-    //     return;
-    // }
-
-    // let newArray = [];
-
-    // cargarCursos();
-    // cargarArchivo();
-    // cargarUsuarios();
-
-    // cursos = cursos.filter(x => x.estado == 1);
-
-    // cursos.forEach(function(curso) {
-    //     let newArray2 = [];
-    //     let temp = inscripciones.filter(x => x.idCurso == curso.idCurso);
-    //     temp.forEach(function(i){
-    //         let temp2 = usuarios.find(u => u.docUsuario == i.docUsuario)
-    //         i.usuario = temp2;
-    //         newArray2.push(i);
-    //     });
-    //     curso.inscritos = newArray2;
-    //     newArray.push(curso);
-    // });
-
-    // console.log(newArray);
-    
-    
-    // res.render('inscripciones/verinscripciones', {
-    //     title: 'Inscripciones',
-    //     inscripciones: newArray
-    // })
 });
 
 /* Eliminar inscripción*/
@@ -161,39 +75,5 @@ router.get('/eliminar/:id', function(req, res, next) {
         }
     });
 });
-
-let cargarArchivo = () => {
-    try{
-        let data = fs.readFileSync(archivo)
-        inscripciones = JSON.parse(data)
-    }catch(error){
-        inscripciones = [];
-    }
-}
-
-let cargarCursos = () => {
-    try{
-        let data = fs.readFileSync(archivoCursos)
-        cursos = JSON.parse(data)
-    }catch(error){
-       cursos = [];
-    }
-}
-
-let guardarArchivo = (data) => {
-    fs.writeFile(archivo, data, (err) => {
-        if (err) throw (err);
-        return true;
-     });
-}
-
-let cargarUsuarios = () => {
-    try{
-        let data = fs.readFileSync(archivoUsuarios)
-        usuarios = JSON.parse(data)
-    }catch(error){
-       usuarios = [];
-    }
-}
 
 module.exports = router;
