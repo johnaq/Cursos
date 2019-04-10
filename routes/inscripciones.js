@@ -56,118 +56,79 @@ router.get('/nuevo/:idCurso', function(req, res, next) {
 
 /* Ver inscripciones */
 router.get('/', function(req, res, next) {
+    let session = req.session.usuario;
+    Inscripciones.find({idUsuario: session._id}).populate('idCurso').exec((err,inscripciones) => {
+        res.render('inscripciones/index', {
+            title: 'Inscripciones',
+            inscripciones: inscripciones
+        })
+    });
+});
 
-    // Inscripciones.find({}).exec((err, result) => {
-        
-    //     Usuarios.populate(result, {path: 'idUsuario'}, (err, usuario) => {
+router.get('/verinscripciones', function(req, res, next) {
 
-    //         Cursos.populate(result, {path: 'idUsuario'}, (err, usuario) => {
-
-    //     });
-
-    // });
-
-
-    Inscripciones.find({}).populate('idCurso').exec((err, inscripcion) => {
-		if(err){
-			res.status(500).send({message:'Error de conexión a la BD'});
-		}else{
-			if(!inscripcion){
-				res.status(404).send({message: 'No existe el curso'});
-			}else{
-				Usuarios.populate(inscripcion,'idUsuario', (err, idUsuario) => {
-					
-					if(err){
-						res.status(500).send({message: 'Error en la peticiona la BD'});
-					}else{
-						res.status(200).send(idUsuario);
-					}
-				});
-			}
-		}
-	});
+    Inscripciones.find({}).populate('idCurso').populate('idUsuario').exec((err,inscripciones) => {
+        console.log(inscripciones)
+        res.render('inscripciones/verinscripciones', {
+            title: 'Inscripciones',
+            inscripciones: inscripciones
+        })
+    });
 
 
 
-    
-//     let session = req.session.usuario;
-//     cargarArchivo();
-//     let buscar = inscripciones.filter(x => x.docUsuario == session.docUsuario);
-//     // console.log(buscar);    
-//     if(buscar !== undefined){
-//         res.render('inscripciones/index',
-//         { 
-//             title: 'Inscripciones - ' + session.nombreUsuario,
-//             inscripcion: buscar,
-//             coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
-//             aspirante: (session.rolUsuario == 'Aspirante') ? true : false
-//         });
-//     }else{
-        
-//         res.redirect('/cursos')
-//     }
-// });
 
-// router.get('/verinscripciones', function(req, res, next) {
-//     let session = req.session.usuario;
-//     if(!session.rolUsuario == 'Coordinador'){
-//         req.flash('mensajeError', 'No tiene permisos')
-//         res.redirect('/cursos')
-//         return;
-//     }
 
-//     let newArray = [];
+    let session = req.session.usuario;
+    if(!session.rolUsuario == 'Coordinador'){
+        req.flash('mensajeError', 'No tiene permisos')
+        res.redirect('/cursos')
+        return;
+    }
 
-//     cargarCursos();
-//     cargarArchivo();
-//     cargarUsuarios();
+    let newArray = [];
 
-//     cursos = cursos.filter(x => x.estado == 1);
+    cargarCursos();
+    cargarArchivo();
+    cargarUsuarios();
 
-//     cursos.forEach(function(curso) {
-//         let newArray2 = [];
-//         let temp = inscripciones.filter(x => x.idCurso == curso.idCurso);
-//         temp.forEach(function(i){
-//             let temp2 = usuarios.find(u => u.docUsuario == i.docUsuario)
-//             i.usuario = temp2;
-//             newArray2.push(i);
-//         });
-//         curso.inscritos = newArray2;
-//         newArray.push(curso);
-//     });
+    cursos = cursos.filter(x => x.estado == 1);
 
-//     console.log(newArray);
+    cursos.forEach(function(curso) {
+        let newArray2 = [];
+        let temp = inscripciones.filter(x => x.idCurso == curso.idCurso);
+        temp.forEach(function(i){
+            let temp2 = usuarios.find(u => u.docUsuario == i.docUsuario)
+            i.usuario = temp2;
+            newArray2.push(i);
+        });
+        curso.inscritos = newArray2;
+        newArray.push(curso);
+    });
+
+    console.log(newArray);
     
     
-    // res.render('inscripciones/verinscripciones', {
-    //     title: 'Inscripciones',
-    //     inscripciones: newArray
-    // })
+    res.render('inscripciones/verinscripciones', {
+        title: 'Inscripciones',
+        inscripciones: newArray
+    })
 });
 
 /* Eliminar inscripción*/
 router.get('/eliminar/:id', function(req, res, next) {
-
-    if(!req.session.usuario){
-        req.flash('mensajeError', 'No tiene permisos')
-        res.redirect('/')
-        return;
-    }
-    let session = req.session.usuario;    
-    cargarArchivo();
-    //Se buscan los cursos de la persona que se encuentre logueada
-    let buscar = inscripciones.filter(x => x.id != req.params.id);cargarCursos();             
-    console.log(buscar);
+    let session = req.session.usuario;
+    Inscripciones.deleteOne({_id: req.params.id}, (err, result) => {
+        if(result.ok){
+            req.flash('mensajeExito', 'La inscripción se ha eliminado con éxito.')
     
-    guardarArchivo(JSON.stringify(buscar));
-    req.flash('mensajeExito', 'La inscripción se ha eliminado con éxito.')
-    
-    if(session.rolUsuario == 'Aspirante'){
-        res.redirect('/inscripciones')
-    }else{
-        res.redirect('/inscripciones/verinscripciones')
-    }
-    
+            if(session.rolUsuario == 'Aspirante'){
+                res.redirect('/inscripciones')
+            }else{
+                res.redirect('/inscripciones/verinscripciones')
+            }
+        }
+    });
 });
 
 let cargarArchivo = () => {
