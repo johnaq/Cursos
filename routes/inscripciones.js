@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path');
 var fs = require('fs');
 var router = express.Router();
+var ObjectId = require('mongoose').Types.ObjectId; 
 
 const Inscripciones = require('../models/inscripciones');
 const Usuarios = require('../models/usuarios');
@@ -67,12 +68,31 @@ router.get('/', function(req, res, next) {
 
 router.get('/verinscripciones', function(req, res, next) {
 
-    Inscripciones.find({}).populate('idCurso').populate('idUsuario').exec((err,inscripciones) => {
-        console.log(inscripciones)
-        res.render('inscripciones/verinscripciones', {
-            title: 'Inscripciones',
-            inscripciones: inscripciones
-        })
+
+    // Inscripciones.find({}).populate('idCurso').populate('idUsuario').exec((err,inscripciones) => {
+    //     res.render('inscripciones/index', {
+    //         title: 'Inscripciones',
+    //         inscripciones: inscripciones
+    //     })
+    // });
+
+    //TODO: Terminar
+    Cursos.find({estado: 1}).exec((err, result) => {
+
+        result.forEach(curso => {
+            console.log(curso)
+            Inscripciones.find({idCurso: new ObjectId(curso.id)}).populate('idUsuario').exec((err, inscripcion) => {
+                curso['inscripciones'].push(inscripcion);
+                console.log(inscripcion);
+            });
+
+            //console.log(JSON.stringify(result));
+        });
+        res.render('cursos/index', 
+        { 
+            title: 'Cursos',
+            listaCursos: result
+        });
     });
 
 
