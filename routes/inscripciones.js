@@ -84,10 +84,13 @@ router.get('/verinscripciones', function(req, res, next) {
         listInsc.forEach(curso => {
             // console.log(curso)
             curso['inscripciones'] = [];
+            // curso['idInscripcion'] = [];
             Inscripciones.find({idCurso: curso.id}).populate('idUsuario').exec((err, inscripcion) => {
                 // console.log(inscripcion);
                 inscripcion.forEach(element => {
+                    element.idUsuario['idInscripcion'] = element.id;
                     curso['inscripciones'].push(element.idUsuario);
+                    // curso['idInscripcion'].push(element.id);
                 }); 
                 verInsc.push(curso);
                 console.log(verInsc);               
