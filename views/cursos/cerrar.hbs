@@ -1,0 +1,29 @@
+{{>navbar}}
+<div class="row">
+  <h1>Cerrar curso</h1>
+</div>
+<form method="POST" action="/cursos/cerrar">  
+  <div class="form-group row">
+    <label for="nombreCurso" class="col-sm-2 col-form-label">Nombre Curso</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="nombreCurso" name="nombreCurso" value="{{nomCurso}}" readonly="readonly">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="docente" class="col-sm-2 col-form-label">Docente</label>
+    <div class="col-sm-10">
+      <select class="form-control" name="docente" id="docente">
+          <option value="0" selected="selected">--Seleccionar Docente--</option>
+          {{#each docentes}}
+          <option value="{{_id}}">{{nombreUsuario}}</option>
+          {{/each}}
+      </select>
+    </div>
+  </div>  
+  <div class="form-group row">
+    <div class="col-sm-10">
+      <button type="submit" class="btn btn-primary">Cerrar</button>
+    </div>
+  </div>  
+  <input type="hidden" class="form-control" id="idCurso" name="idCurso" value="{{idCurso}}">
+</form>

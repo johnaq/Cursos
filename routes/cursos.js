@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 
 const Cursos = require('../models/cursos');
+const Usuarios = require('../models/usuarios');
+const Cierres = require('../models/cerrar');
 
 //Lista de cursos para aspirantes y coordinadores
 router.get('/', function(req, res, next) {
@@ -71,27 +73,69 @@ router.post('/nuevo', function(req, res, next) {
     }); 
 });
 
-router.get('/estado/:id', function(req, res, next) {
-    Cursos.findOne({idCurso: req.params.id}).exec((err, result) => { 
-        Cursos.updateOne({idCurso: req.params.id},
+router.get('/cerrar/:id', function(req, res, next) {
+
+    Cursos.findOne({_id: req.params.id}).exec((err, result) => { 
+        
+        if (err) {            
+            req.flash('mensajeError', err);
+            return res.redirect('/cursos');
+        }
+
+        Usuarios.find({rolUsuario: 'Docente'}).exec((error, docentes) => {
+            if (error) {                
+                req.flash('mensajeError', err);
+                return res.redirect('/cursos');
+            }
+
+            res.render('cursos/cerrar', 
+            { 
+                title: 'Cerrar Curso - ' + result.nombreCurso,
+                idCurso: result._id,
+                nomCurso: result.nombreCurso,
+                docentes: docentes
+            });
+            
+        });       
+
+    });    
+    
+});
+
+router.post('/cerrar', function(req, res, next) {    
+    
+    let cierre = new Cierres ({
+        idCurso: req.body.idCurso,
+        idDocente: req.body.docente
+    });
+
+    cierre.save( (err, result) => {
+        if (err) {
+            req.flash('mensajeError', err);
+            return res.redirect('/cursos');
+        }
+
+        Cursos.updateOne({_id: req.body.idCurso},
         {
-            estado: (result.estado == 1) ? 0 : 1
+            estado: 0
         }, (err, result) => {
             if(result.ok){
-                req.flash('mensajeExito', 'Curso activado/desactivado con exito')
-                res.redirect(req.get('referer'))
+                req.flash('mensajeExito', 'Curso cerrado correctamente');
+                res.redirect('/cursos');
             }else{
                 req.flash('mensajeError', 'No se pudo actualizar el curso')
-                res.redirect(req.get('referer'))
+                res.redirect('/cursos');
             }
-        });
+        });      
+                            
     });
+
 });
 
 /* Ver curso */
 router.get('/:id', function(req, res, next) {
     Cursos.findOne({idCurso: req.params.id}).exec((err, result) => {
-        if (err) {            
+        if (err) {
             req.flash('mensajeError', err);
             return res.redirect('/cursos');
         }

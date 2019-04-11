@@ -14,9 +14,9 @@
 
   {{#if coordinador}}
     {{#if curso.estado}}
-      <a class="btn btn-primary" href="/cursos/estado/{{curso.idCurso}}">Desactivar curso</a>
+      <a class="btn btn-primary" href="/cursos/cerrar/{{curso._id}}">Cerrar curso</a>
     {{else}}
-      <a class="btn btn-primary" href="/cursos/estado/{{curso.idCurso}}">Activar curso</a>
+      <p>El curso se encuentra cerrado</p>
     {{/if}}
   {{else}}
     <a class="btn btn-primary" href="/inscripciones/nuevo/{{curso._id}}">Inscribirse</a>
