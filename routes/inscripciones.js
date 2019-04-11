@@ -47,17 +47,14 @@ router.get('/verinscripciones', function(req, res, next) {
                     element.idUsuario['idInscripcion'] = element.id;
                     curso['inscripciones'].push(element.idUsuario);
                 }); 
-                verInsc.push(curso);
-                console.log(verInsc);               
+                verInsc.push(curso);              
             });
         });
-        
+        res.render('inscripciones/verinscripciones', {
+            title: 'Inscripciones',
+            inscripciones: verInsc
+        })
     });
-
-    res.render('inscripciones/verinscripciones', {
-        title: 'Inscripciones',
-        inscripciones: verInsc
-    })
 });
 
 /* Eliminar inscripción*/

@@ -4,6 +4,7 @@ var router = express.Router();
 const Cursos = require('../models/cursos');
 const Usuarios = require('../models/usuarios');
 const Cierres = require('../models/cerrar');
+const Inscripciones = require('../models/inscripciones');
 
 //Lista de cursos para aspirantes y coordinadores
 router.get('/', function(req, res, next) {
@@ -13,19 +14,47 @@ router.get('/', function(req, res, next) {
         return;
     }
     let session = req.session.usuario;
-    
-    Cursos.find({}).exec((err, result) => {
-        //Si es rol Aspirante solo se visualizan los cursos activos
-        if(session.rolUsuario == 'Aspirante'){
-            result = result.filter(x => x.estado == 1)
-        }
+    var listCursos = [];
+    var verInsc = [];
+    if(session.rolUsuario == 'Docente'){
+        //Logica para el docente
 
-        res.render('cursos/index', 
-        { 
-            title: 'Cursos',
-            listaCursos: result
+        Cierres.find({idDocente: session._id}).exec((err, result) => {
+            listCursos = result;
+            listCursos.forEach(curso => {
+                curso['inscripciones'] = [];
+                Inscripciones.find({idCurso: curso.idCurso.id}).populate('idUsuario').exec((err, inscripcion) => {
+                    inscripcion.forEach(element => {
+                        curso['inscripciones'].push(element.idUsuario);
+                    }); 
+                    verInsc.push(curso);              
+                });
+            });
+            console.log(JSON.stringify(verInsc))
+            res.render('inscripciones/verinscripciones', {
+                title: 'Inscripciones',
+                inscripciones: verInsc
+            })
         });
-    });
+
+
+
+    }else{
+        Cursos.find({}).exec((err, result) => {
+            //Si es rol Aspirante solo se visualizan los cursos activos
+            if(session.rolUsuario == 'Aspirante'){
+                result = result.filter(x => x.estado == 1)
+            }
+    
+            res.render('cursos/index', 
+            { 
+                title: 'Cursos',
+                listaCursos: result
+            });
+        });
+    }
+
+    
 });
 
 /* Nuevo curso */
