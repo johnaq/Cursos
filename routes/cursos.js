@@ -19,24 +19,41 @@ router.get('/', function(req, res, next) {
     if(session.rolUsuario == 'Docente'){
         //Logica para el docente
 
-        Cierres.find({idDocente: session._id}).populate('idCurso').exec((err, result) => {
-            listCursos = result;
-            listCursos.forEach(curso => {
+        Cierres.find({idDocente: session._id}).populate('idCurso').then(function (cierres){
+            cierres.forEach(curso => {
                 curso['cierres'] = [];
-                Inscripciones.find({idCurso: curso.idCurso.id}).populate('idUsuario').exec((err, inscripcion) => {
+                Inscripciones.find({idCurso: curso.idCurso.id}).populate('idUsuario').then(function(inscripcion){
                     inscripcion.forEach(element => {
                         // element.idUsuario['cierres'] = element.nombreCurso;
                         curso['cierres'].push(element.idUsuario);
                     }); 
-                    verInsc.push(curso);              
-                });
-            });
-            console.log(JSON.stringify(verInsc))
+                    verInsc.push(curso);
+                })
+            })
             res.render('cursos/vercursosdocente', {
                 title: 'Cursos docente',
                 inscripciones: verInsc
             })
-        });
+        })
+
+        // Cierres.find({idDocente: session._id}).populate('idCurso').exec((err, result) => {
+        //     listCursos = result;
+        //     listCursos.forEach(curso => {
+        //         curso['cierres'] = [];
+        //         Inscripciones.find({idCurso: curso.idCurso.id}).populate('idUsuario').exec((err, inscripcion) => {
+        //             inscripcion.forEach(element => {
+        //                 // element.idUsuario['cierres'] = element.nombreCurso;
+        //                 curso['cierres'].push(element.idUsuario);
+        //             }); 
+        //             verInsc.push(curso);              
+        //         });
+        //     });
+        //     console.log(JSON.stringify(verInsc))
+        //     res.render('cursos/vercursosdocente', {
+        //         title: 'Cursos docente',
+        //         inscripciones: verInsc
+        //     })
+        // });
         
 
 
