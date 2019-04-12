@@ -19,10 +19,10 @@ router.get('/', function(req, res, next) {
     if(session.rolUsuario == 'Docente'){
         //Logica para el docente
 
-        Cierres.find({idDocente: session._id}).populate('idCurso').then(function (cierres){
+        Cierres.find({idDocente: session._id}).populate('idCurso').exec().then(function (cierres){
             cierres.forEach(curso => {
                 curso['cierres'] = [];
-                Inscripciones.find({idCurso: curso.idCurso.id}).populate('idUsuario').then(function(inscripcion){
+                Inscripciones.find({idCurso: curso.idCurso.id}).populate('idUsuario').exec().then(function(inscripcion){
                     inscripcion.forEach(element => {
                         // element.idUsuario['cierres'] = element.nombreCurso;
                         curso['cierres'].push(element.idUsuario);
