@@ -76,7 +76,7 @@ router.post('/editar', function(req, res, next) {
         nombreUsuario: req.body.nombreUsuario,
         emailUsuario: req.body.emailUsuario,
         telUsuario: req.body.telUsuario,
-        rolUsuario: (req.body.newRolUsuario == '0') ? req.body.rolUsuario : req.body.newRolUsuario
+        rolUsuario: req.body.rolUsuario
     }, (err, result) => {
         var test = result;
         if(result.ok){
