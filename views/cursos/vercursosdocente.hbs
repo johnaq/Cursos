@@ -1,40 +1,34 @@
 {{>navbar}}
+
+{{#if aspirante}}
 <div class="row">
-  <h1>Estos son tus cursos asignados</h1>
+  <h1>Cursos disponibles</h1>
 </div>
-<div class="accordion" id="accordionExample">
-{{#each inscripciones}}
-  <div class="card">
-    <div class="card-header" id="heading{{idCurso.idCurso}}">
-      <h2 class="mb-0">
-        <button class="btn btn-dark btn-lg btn-block" type="button" data-toggle="collapse" data-target="#collapse{{idCurso.idCurso}}" aria-expanded="true" aria-controls="collapse{{idCurso.idCurso}}">
-          {{idCurso.nombreCurso}}
-        </button>
-      </h2>
-    </div>
-    <div id="collapse{{idCurso.idCurso}}" class="collapse" aria-labelledby="heading{{idCurso.idCurso}}" data-parent="#accordionExample">
-      <div class="card-body">
-        <table class="table">
-        <thead class="thead-dark">
-            <tr>
-            <th scope="col">Documento</th>
-            <th scope="col">Nombre</th>
-            <th scope="col">Correo</th>
-            <th scope="col">Telefono</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each cierres}}
-            <tr>
-            <td scope="row">{{docUsuario}}</td>
-            <td>{{nombreUsuario}}</td>
-            <td>{{emailUsuario}}</td>
-            <td>{{telUsuario}}</td>
-            </tr>
-            {{/each}}
-        </table>
-      </div>
-    </div>
-  </div>
-  {{/each}}
+{{else}}
+<div class="row">
+  <h1>Cursos</h1>
 </div>
+{{/if}}
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Nombre</th>
+      <th scope="col">Descripcion</th>
+      <th scope="col">Valor</th>
+      {{#if coordinador}}
+      <th scope="col">Estado</th>
+      {{/if}}
+      <th scope="col">Opciones</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    {{#each cursosCerrados}}
+    <tr>
+      <td scope="row">{{idCurso.nombreCurso}}</td>
+      <td>{{idCurso.descripcion}}</td>
+      <td>{{idCurso.valor}}</td>
+      <td><a class="btn btn-info" href="/cursos/inscritos/{{idCurso.id}}">Ver inscritos</a></td>
+    </tr>
+    {{/each}}
+</table>

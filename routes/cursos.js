@@ -14,49 +14,14 @@ router.get('/', function(req, res, next) {
         return;
     }
     let session = req.session.usuario;
-    var listCursos = [];
-    var verInsc = [];
     if(session.rolUsuario == 'Docente'){
         //Logica para el docente
-
-        Cierres.find({idDocente: session._id}).populate('idCurso').exec().then(function (cierres){
-            cierres.forEach(curso => {
-                curso['cierres'] = [];
-                Inscripciones.find({idCurso: curso.idCurso.id}).populate('idUsuario').exec().then(function(inscripcion){
-                    inscripcion.forEach(element => {
-                        // element.idUsuario['cierres'] = element.nombreCurso;
-                        curso['cierres'].push(element.idUsuario);
-                    }); 
-                    verInsc.push(curso);
-                })
-            })
+        Cierres.find({idDocente: session._id}).populate('idCurso').then(function (cursosCerrados){
             res.render('cursos/vercursosdocente', {
                 title: 'Cursos docente',
-                inscripciones: verInsc
+                cursosCerrados: cursosCerrados
             })
-        })
-
-        // Cierres.find({idDocente: session._id}).populate('idCurso').exec((err, result) => {
-        //     listCursos = result;
-        //     listCursos.forEach(curso => {
-        //         curso['cierres'] = [];
-        //         Inscripciones.find({idCurso: curso.idCurso.id}).populate('idUsuario').exec((err, inscripcion) => {
-        //             inscripcion.forEach(element => {
-        //                 // element.idUsuario['cierres'] = element.nombreCurso;
-        //                 curso['cierres'].push(element.idUsuario);
-        //             }); 
-        //             verInsc.push(curso);              
-        //         });
-        //     });
-        //     console.log(JSON.stringify(verInsc))
-        //     res.render('cursos/vercursosdocente', {
-        //         title: 'Cursos docente',
-        //         inscripciones: verInsc
-        //     })
-        // });
-        
-
-
+        });
     }else{
         Cursos.find({}).exec((err, result) => {
             //Si es rol Aspirante solo se visualizan los cursos activos
@@ -71,8 +36,6 @@ router.get('/', function(req, res, next) {
             });
         });
     }
-
-    
 });
 
 /* Nuevo curso */
@@ -195,6 +158,23 @@ router.get('/:id', function(req, res, next) {
             });
         }
     });
+});
+
+router.get('/inscritos/:id', function(req, res, next) {
+
+    Inscripciones.find({idCurso: req.params.id}).populate('idUsuario').exec((err, result) => { 
+        
+        if (err) {            
+            req.flash('mensajeError', err);
+            return res.redirect('/cursos');
+        }
+        res.render('cursos/verinscritos', 
+        { 
+            title: 'Inscritos',
+            inscritos: result
+        });
+    });    
+    
 });
 
 module.exports = router;
