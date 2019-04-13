@@ -7,6 +7,7 @@ var session = require('express-session');
 var flash = require('connect-flash');
 var hbs = require('hbs');
 var mongoose = require('mongoose');
+require('./helpers/helpers');
 
 var usuariosRouter = require('./routes/usuarios');
 var cursosRouter = require('./routes/cursos');
@@ -57,13 +58,6 @@ app.use(function(req, res, next){
   res.locals.mensajeExito = req.flash('mensajeExito');
   res.locals.mensajeError = req.flash('mensajeError');
   next()
-});
-
-//Helper para seleccionar valor por defecto en los select
-hbs.registerHelper('select', function(selected, options) {
-  return options.fn(this).replace(
-      new RegExp(' value=\"' + selected + '\"'),
-      '$& selected="selected"');
 });
 
 app.use('/', loginRouter);
