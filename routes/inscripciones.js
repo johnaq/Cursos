@@ -9,19 +9,29 @@ const Cursos = require('../models/cursos');
 router.get('/nuevo/:idCurso', function(req, res, next) {
 
     let session = req.session.usuario
-    let inscripcion = new Inscripciones ({
-        idCurso: req.params.idCurso,
-        idUsuario:  session._id,
+
+    Inscripciones.find({idUsuario: session._id, idCurso: req.params.idCurso}).exec((err,inscripciones) => {
+        if (inscripciones.length > 0) {
+            req.flash('mensajeError', 'El usuario ya se encuentra inscrito en el curso');
+            // return res.redirect(req.get('referer'))
+            return res.redirect('/inscripciones');            
+        }else{
+            let inscripcion = new Inscripciones ({
+                idCurso: req.params.idCurso,
+                idUsuario:  session._id,
+            });
+            
+            inscripcion.save( (err, result) => {
+                if (err) {
+                    req.flash('mensajeError', err);
+                    return res.redirect('/inscripciones');
+                }
+                req.flash('mensajeExito', 'Inscripción creada correctamente'); 
+                res.redirect('/inscripciones')                  
+            });
+        }
     });
     
-    inscripcion.save( (err, result) => {
-        if (err) {
-            req.flash('mensajeError', err);
-            return res.redirect('/inscripciones');
-        }
-        req.flash('mensajeExito', 'Curso creado correctamente'); 
-        res.redirect('/inscripciones')                  
-    });
 });
 
 /* Ver inscripciones */
@@ -35,27 +45,27 @@ router.get('/', function(req, res, next) {
     });
 });
 
-router.get('/verinscripciones', function(req, res, next) {
-    var listInsc = [];
-    var verInsc = [];
-    Cursos.find({estado: 1}).exec((err, result) => {
-        listInsc = result;
-        listInsc.forEach(curso => {
-            curso['inscripciones'] = [];
-            Inscripciones.find({idCurso: curso.id}).populate('idUsuario').exec((err, inscripcion) => {
-                inscripcion.forEach(element => {
-                    element.idUsuario['idInscripcion'] = element.id;
-                    curso['inscripciones'].push(element.idUsuario);
-                }); 
-                verInsc.push(curso);              
-            });
-        });
-        res.render('inscripciones/verinscripciones', {
-            title: 'Inscripciones',
-            inscripciones: verInsc
-        })
-    });
-});
+// router.get('/verinscripciones', function(req, res, next) {
+//     // var listInsc = [];
+//     // var verInsc = [];    
+//     // Cursos.find({estado: 1}).exec((err, result) => {
+//     //     listInsc = result;
+//     //     listInsc.forEach(curso => {
+//     //         curso['inscripciones'] = [];
+//     //         Inscripciones.find({idCurso: curso.id}).populate('idUsuario').exec((err, inscripcion) => {
+//     //             inscripcion.forEach(element => {
+//     //                 element.idUsuario['idInscripcion'] = element.id;
+//     //                 curso['inscripciones'].push(element.idUsuario);
+//     //             }); 
+//     //             verInsc.push(curso);              
+//     //         });
+//     //     });
+//     //     res.render('inscripciones/verinscripciones', {
+//     //         title: 'Inscripciones',
+//     //         inscripciones: verInsc
+//     //     })
+//     // });
+// });
 
 /* Eliminar inscripción*/
 router.get('/eliminar/:id', function(req, res, next) {
@@ -67,7 +77,7 @@ router.get('/eliminar/:id', function(req, res, next) {
             if(session.rolUsuario == 'Aspirante'){
                 res.redirect('/inscripciones')
             }else{
-                res.redirect('/inscripciones/verinscripciones')
+                res.redirect('/cursos')
             }
         }
     });

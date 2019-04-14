@@ -37,7 +37,14 @@
         {{/if}}
       </td>
       {{/if}}
-      <td><a class="btn btn-info" href="/cursos/{{idCurso}}">Ver mas</a></td>
+      <td>
+        <a class="btn btn-info" href="/cursos/{{idCurso}}">Ver mas</a>
+        {{#if ../coordinador}}
+          {{#if estado}}
+          <a class="btn btn-success" href="/cursos/inscritos/{{id}}">Ver inscritos</a>
+          {{/if}}
+        {{/if}}
+      </td>
     </tr>
     {{/each}}
 </table>
