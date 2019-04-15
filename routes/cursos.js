@@ -1,10 +1,10 @@
 var express = require('express');
-var path = require('path');
-var fs = require('fs');
 var router = express.Router();
 
-const archivo = path.join(__dirname , '../datos/cursos.json');
-var cursos = [];
+const Cursos = require('../models/cursos');
+const Usuarios = require('../models/usuarios');
+const Cierres = require('../models/cerrar');
+const Inscripciones = require('../models/inscripciones');
 
 //Lista de cursos para aspirantes y coordinadores
 router.get('/', function(req, res, next) {
@@ -14,20 +14,28 @@ router.get('/', function(req, res, next) {
         return;
     }
     let session = req.session.usuario;
-    cargarArchivo();
-
-    //Si es rol Aspirante solo se visualizan los cursos activos
-    if(session.rolUsuario == 'Aspirante'){
-        cursos = cursos.filter(x => x.estado == 1)
-    }
+    if(session.rolUsuario == 'Docente'){
+        //Logica para el docente
+        Cierres.find({idDocente: session._id}).populate('idCurso').then(function (cursosCerrados){
+            res.render('cursos/vercursosdocente', {
+                title: 'Cursos docente',
+                cursosCerrados: cursosCerrados
+            })
+        });
+    }else{
+        Cursos.find({}).exec((err, result) => {
+            //Si es rol Aspirante solo se visualizan los cursos activos
+            if(session.rolUsuario == 'Aspirante'){
+                result = result.filter(x => x.estado == 1)
+            }
     
-    res.render('cursos/index', 
-    { 
-        title: 'Cursos',
-        listaCursos: cursos,
-        coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
-        aspirante: (session.rolUsuario == 'Aspirante') ? true : false 
-    });
+            res.render('cursos/index', 
+            { 
+                title: 'Cursos',
+                listaCursos: result
+            });
+        });
+    }
 });
 
 /* Nuevo curso */
@@ -35,86 +43,138 @@ router.get('/nuevo', function(req, res, next) {
     let session = req.session.usuario;
     res.render('cursos/nuevo',
     {
-        title: "Crear curso",
-        coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
-        aspirante: (session.rolUsuario == 'Aspirante') ? true : false
+        title: "Crear curso"
     });
 });
 
 /* Nuevo curso */
 router.post('/nuevo', function(req, res, next) {
-    cargarArchivo();
-    let buscar = cursos.find(x => x.idCurso == req.body.idCurso);
+    Cursos.find({idCurso: req.body.idCurso}).exec((err, result) => { 
+        if (err) {            
+            req.flash('mensajeError', err);
+            return res.redirect('/cursos/nuevo');
+        }
 
-    if(buscar === undefined){
-        let curso = {
-            idCurso: req.body.idCurso,
-            nombreCurso: req.body.nombreCurso,
-            descripcion: req.body.descripcion,
-            valor: req.body.valor,
-            modalidad: req.body.modalidad,
-            intensidad: req.body.intensidad,
-            estado: 1
-        };
-        cursos.push(curso);
-        guardarArchivo(JSON.stringify(cursos));
-        req.flash('mensajeExito', 'Curso creado correctamente')
-    }else{
-        req.flash('mensajeError', 'El curso con ID '+req.body.idCurso+' ya existe')
-    }
-    res.redirect('/cursos/nuevo')
+        if(result.length == 0){
+            let curso = new Cursos ({
+                idCurso: req.body.idCurso,
+                nombreCurso: req.body.nombreCurso,
+                descripcion: req.body.descripcion,
+                valor: req.body.valor,
+                modalidad: (req.body.modalidad == "0") ? "" : req.body.modalidad,
+                intensidad: req.body.intensidad,
+                estado: 1
+            });
+
+            curso.save( (err, result) => {
+                if (err) {
+                    req.flash('mensajeError', err);
+                    return res.redirect('/cursos/nuevo');
+                }
+                req.flash('mensajeExito', 'Curso creado correctamente');
+                res.redirect('/cursos');
+                           
+            });
+             
+        }else{
+            req.flash('mensajeError', 'El curso con id '+req.body.idCurso+' ya existe')
+            res.redirect('/cursos/nuevo');
+        }
+    }); 
 });
 
-router.get('/estado/:id', function(req, res, next) {
-    cargarArchivo();
-    let session = req.session.usuario;
-    let buscar = cursos.find(x => x.idCurso == req.params.id);
-    if(buscar !== undefined){
-        buscar['estado'] = (buscar['estado'] == 1) ? 0 : 1;
-        guardarArchivo(JSON.stringify(cursos))
-        req.flash('mensajeExito', 'Curso activado/desactivado con exito')
-        res.redirect(req.get('referer'))
-    }else{
-        req.flash('mensajeError', 'No se pudo actualizar el curso')
-        res.redirect('/cursos')
-    }
+router.get('/cerrar/:id', function(req, res, next) {
+
+    Cursos.findOne({_id: req.params.id}).exec((err, result) => { 
+        
+        if (err) {            
+            req.flash('mensajeError', err);
+            return res.redirect('/cursos');
+        }
+
+        Usuarios.find({rolUsuario: 'Docente'}).exec((error, docentes) => {
+            if (error) {                
+                req.flash('mensajeError', err);
+                return res.redirect('/cursos');
+            }
+
+            res.render('cursos/cerrar', 
+            { 
+                title: 'Cerrar Curso - ' + result.nombreCurso,
+                idCurso: result._id,
+                nomCurso: result.nombreCurso,
+                docentes: docentes
+            });
+            
+        });       
+
+    });    
+    
+});
+
+router.post('/cerrar', function(req, res, next) {    
+    
+    let cierre = new Cierres ({
+        idCurso: req.body.idCurso,
+        idDocente: req.body.docente
+    });
+
+    cierre.save( (err, result) => {
+        if (err) {
+            req.flash('mensajeError', err);
+            return res.redirect('/cursos');
+        }
+
+        Cursos.updateOne({_id: req.body.idCurso},
+        {
+            estado: 0
+        }, (err, result) => {
+            if(result.ok){
+                req.flash('mensajeExito', 'Curso cerrado correctamente');
+                res.redirect('/cursos');
+            }else{
+                req.flash('mensajeError', 'No se pudo actualizar el curso')
+                res.redirect('/cursos');
+            }
+        });      
+                            
+    });
+
 });
 
 /* Ver curso */
 router.get('/:id', function(req, res, next) {
-    cargarArchivo();
-    let session = req.session.usuario;
-    let buscar = cursos.find(x => x.idCurso == req.params.id);
-    if(buscar !== undefined){
-        res.render('cursos/curso', 
-        { 
-            title: 'Cursos - ' + buscar.nombreCurso,
-            curso: buscar,
-            coordinador: (session.rolUsuario == 'Coordinador') ? true : false,
-            aspirante: (session.rolUsuario == 'Aspirante') ? true : false
-        });
-    }else{
-        res.redirect('/cursos')
-    }
+    Cursos.findOne({idCurso: req.params.id}).exec((err, result) => {
+        if (err) {
+            req.flash('mensajeError', err);
+            return res.redirect('/cursos');
+        }
+
+        if(result){
+            res.render('cursos/curso', 
+            { 
+                title: 'Curso - ' + result.nombreCurso,
+                curso: result
+            });
+        }
+    });
 });
 
+router.get('/inscritos/:id', function(req, res, next) {
 
-
-let cargarArchivo = () => {
-    try{
-        let data = fs.readFileSync(archivo)
-        cursos = JSON.parse(data)
-    }catch(error){
-       cursos = [];
-    }
-}
-
-let guardarArchivo = (data) => {
-    fs.writeFile(archivo, data, (err) => {
-        if (err) throw (err);
-        console.log(err)
-        return true;
-     });
-}
+    Inscripciones.find({idCurso: req.params.id}).populate('idUsuario').exec((err, result) => { 
+        
+        if (err) {            
+            req.flash('mensajeError', err);
+            return res.redirect('/cursos');
+        }
+        res.render('cursos/verinscritos', 
+        { 
+            title: 'Inscritos',
+            inscritos: result
+        });
+    });    
+    
+});
 
 module.exports = router;

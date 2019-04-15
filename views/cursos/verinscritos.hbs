@@ -1,0 +1,29 @@
+{{>navbar}}
+<div class="row">
+  <h1>Listado de usuarios inscritos</h1>
+</div>
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Documento</th>
+      <th scope="col">Nombre</th>
+      <th scope="col">Telefono</th>   
+      <th scope="col">Correo</th>
+      {{#if coordinador}}
+       <th scope="col">Opciones</th>
+      {{/if}}
+    </tr>
+  </thead>
+  <tbody>
+    {{#each inscritos}}
+    <tr>
+      <td scope="row">{{idUsuario.docUsuario}}</td>
+      <td>{{idUsuario.nombreUsuario}}</td>
+      <td>{{idUsuario.telUsuario}}</td>
+      <td>{{idUsuario.emailUsuario}}</td>
+      {{#if ../coordinador}}
+       <td><a class="btn btn-danger" href="/inscripciones/eliminar/{{id}}">Eliminar</a></td>
+      {{/if}}
+    </tr>
+    {{/each}}
+</table>
