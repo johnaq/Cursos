@@ -1,5 +1,14 @@
 {{>navbar}}
 
+{{#if aspirante}}
+<div class="row">
+  <h1>Cursos disponibles</h1>
+</div>
+{{else}}
+<div class="row">
+  <h1>Cursos</h1>
+</div>
+{{/if}}
 <table class="table">
   <thead class="thead-dark">
     <tr>
@@ -22,17 +31,24 @@
       {{#if ../coordinador}}
       <td>
         {{#if estado}}
-          <span class="badge badge-success">Activo</span>
+          <span class="badge badge-success">Disponible</span>
         {{else}}
-          <span class="badge badge-secondary">Inactivo</span>
+          <span class="badge badge-secondary">Cerrado</span>
         {{/if}}
       </td>
       {{/if}}
-      <td><a href="/cursos/{{idCurso}}">Ver mas</a></td>
+      <td>
+        <a class="btn btn-info" href="/cursos/{{idCurso}}">Ver mas</a>
+        {{#if ../coordinador}}
+          {{#if estado}}
+          <a class="btn btn-success" href="/cursos/inscritos/{{id}}">Ver inscritos</a>
+          {{/if}}
+        {{/if}}
+      </td>
     </tr>
     {{/each}}
 </table>
 
 {{#if coordinador}}
-<a href="/cursos/nuevo">Nuevo curso</a>
+<a class="btn btn-primary" href="/cursos/nuevo">Nuevo curso</a>
 {{/if}}

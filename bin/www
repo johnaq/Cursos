@@ -1,6 +1,14 @@
 #!/usr/bin/env node
 
 /**
+ * URL base de datos
+ */
+
+ if(!process.env.URLDB){
+  process.env.URLDB = 'mongodb://localhost:27017/Cursos'
+ }
+
+/**
  * Module dependencies.
  */
 

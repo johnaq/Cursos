@@ -6,8 +6,9 @@ var logger = require('morgan');
 var session = require('express-session');
 var flash = require('connect-flash');
 var hbs = require('hbs');
+var mongoose = require('mongoose');
+require('./helpers/helpers');
 
-var indexRouter = require('./routes/index');
 var usuariosRouter = require('./routes/usuarios');
 var cursosRouter = require('./routes/cursos');
 var loginRouter = require('./routes/login');
@@ -26,7 +27,6 @@ hbs.registerPartials(path.join(__dirname, 'views/partials'))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-
 app.set('view engine', 'hbs');
 
 app.use(logger('dev'));
@@ -41,11 +41,23 @@ app.use(session({ cookie: { maxAge: 600000 },
   saveUninitialized: false}));
 app.use(flash());
 
-//mensajes
+//middleware
 app.use(function(req, res, next){
+  if(req.url != "/" && req.url != "/usuarios/nuevo" && req.url != "/salir"){
+    if(!req.session.usuario){
+      req.flash('mensajeError', 'No tiene permisos')
+      res.redirect('/')
+      return;
+    }
+  }
+  if(req.session.usuario){
+    res.locals.session = true;
+    res.locals.coordinador = (req.session.usuario.rolUsuario == 'Coordinador') ? true : false;
+    res.locals.aspirante = (req.session.usuario.rolUsuario == 'Aspirante') ? true : false;
+  }
   res.locals.mensajeExito = req.flash('mensajeExito');
   res.locals.mensajeError = req.flash('mensajeError');
-  next();
+  next()
 });
 
 app.use('/', loginRouter);
@@ -68,6 +80,14 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+mongoose.set('useCreateIndex', true);
+mongoose.connect(process.env.URLDB, {useNewUrlParser: true}, (err, result) => {
+  if(err){
+    return console.log(err)
+  }
+  console.log('Conectado')
 });
 
 module.exports = app;
