@@ -12,7 +12,7 @@
   * Key para sendgrid
   */
  if(!process.env.SENDGRID_API_KEY){
-  process.env.SENDGRID_API_KEY = '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'
+  process.env.SENDGRID_API_KEY = ''
  }
 
 /**
