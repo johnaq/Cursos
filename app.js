@@ -54,11 +54,18 @@ app.use(function(req, res, next){
     res.locals.session = true;
     res.locals.coordinador = (req.session.usuario.rolUsuario == 'Coordinador') ? true : false;
     res.locals.aspirante = (req.session.usuario.rolUsuario == 'Aspirante') ? true : false;
+
+    var binary = '';
+    var bytes = [].slice.call(new Uint8Array(req.session.usuario.fotoPerfil.data));
+    bytes.forEach((b) => binary += String.fromCharCode(b));
+
+    res.locals.avatar =  binary;
   }
   res.locals.mensajeExito = req.flash('mensajeExito');
   res.locals.mensajeError = req.flash('mensajeError');
   next()
 });
+
 
 app.use('/', loginRouter);
 app.use('/usuarios', usuariosRouter);
