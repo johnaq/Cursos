@@ -12,7 +12,9 @@ const usuarioSchema = new Schema({
         require: true
     },
     emailUsuario: {
-        type: String
+        type: String,
+        require: true,
+        trim: true
     },
     telUsuario: {
         type: String
@@ -24,6 +26,10 @@ const usuarioSchema = new Schema({
     rolUsuario: {
         type: String,
         require: true
+    },
+    fotoPerfil: {
+        data: Buffer,
+        contentType: String
     }
 });
 

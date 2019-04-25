@@ -1,9 +1,13 @@
 var express = require('express');
 var bcrypt = require('bcryptjs');
+var sgMail = require('@sendgrid/mail');
+var multer = require('multer');
 var router = express.Router();
 
 const Usuarios = require('../models/usuarios');
 var saltRounds = 10;
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+var upload = multer({ })
 
 //Lista de usuarios
 router.get('/', function(req, res, next) {
@@ -32,7 +36,7 @@ router.get('/nuevo', function(req, res, next) {
 });
 
 /* Nuevo Usuario */
-router.post('/nuevo', function(req, res, next) {
+router.post('/nuevo', upload.single('fotoUsuario'), function(req, res, next) {
     Usuarios.find({docUsuario: req.body.docUsuario}).exec((err, result) => { 
         if (err) {            
             req.flash('mensajeError', err);
@@ -48,7 +52,8 @@ router.post('/nuevo', function(req, res, next) {
                 emailUsuario:       req.body.emailUsuario,
                 telUsuario:         req.body.telUsuario,
                 pswUsuario:         hashPassword,
-                rolUsuario:         'Aspirante'    
+                rolUsuario:         'Aspirante',
+                fotoPerfil:         req.file.buffer    
             });
 
             usuario.save( (err, result) => {
@@ -56,6 +61,20 @@ router.post('/nuevo', function(req, res, next) {
                     req.flash('mensajeError', err);
                     return res.redirect('/usuarios/nuevo');
                 }
+
+                //Envio de correo
+                const msg = {
+                    to: req.body.emailUsuario,
+                    from: 'jalzate0128@gmail.com',
+                    subject: `Bienvenido a Cursos TdeA`,
+                    text: `Gracias por registrarse en Cursos TdeA
+                    Su usuario es: ${req.body.nombreUsuario}
+                    `,
+                    html: `<strong>Gracias por registrarse en Cursos TdeA</strong>
+                    <p>Su usuario es: ${req.body.nombreUsuario}</p>`,
+                  };
+                  sgMail.send(msg);
+
                 req.flash('mensajeExito', 'Usuario creado correctamente');
                 res.redirect('/usuarios/nuevo');
                            
