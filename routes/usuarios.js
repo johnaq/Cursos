@@ -7,7 +7,8 @@ var router = express.Router();
 const Usuarios = require('../models/usuarios');
 var saltRounds = 10;
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-var upload = multer({ })
+var storage = multer.memoryStorage()
+var upload = multer({ storage: storage})
 
 //Lista de usuarios
 router.get('/', function(req, res, next) {
@@ -52,8 +53,11 @@ router.post('/nuevo', upload.single('fotoUsuario'), function(req, res, next) {
                 emailUsuario:       req.body.emailUsuario,
                 telUsuario:         req.body.telUsuario,
                 pswUsuario:         hashPassword,
-                rolUsuario:         'Aspirante',
-                fotoPerfil:         req.file.buffer    
+                rolUsuario:         'Aspirante', 
+                fotoPerfil: {
+                    data : req.file.buffer,
+                    contentType : req.file.mimetype
+                } 
             });
 
             usuario.save( (err, result) => {

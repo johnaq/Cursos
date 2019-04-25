@@ -55,11 +55,9 @@ app.use(function(req, res, next){
     res.locals.coordinador = (req.session.usuario.rolUsuario == 'Coordinador') ? true : false;
     res.locals.aspirante = (req.session.usuario.rolUsuario == 'Aspirante') ? true : false;
 
-    var binary = '';
-    var bytes = [].slice.call(new Uint8Array(req.session.usuario.fotoPerfil.data));
-    bytes.forEach((b) => binary += String.fromCharCode(b));
-
-    res.locals.avatar =  binary;
+    //Se debe convertir el Uint8Array a un buffer antes de realizar la conversion a base64
+    var buffer = Buffer.from(req.session.usuario.fotoPerfil.data);
+    res.locals.avatar = `data:${req.session.usuario.fotoPerfil.contentType};base64,` + buffer.toString('base64')
   }
   res.locals.mensajeExito = req.flash('mensajeExito');
   res.locals.mensajeError = req.flash('mensajeError');
