@@ -8,7 +8,11 @@ const Usuarios = require('../models/usuarios');
 var saltRounds = 10;
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 var storage = multer.memoryStorage()
-var upload = multer({ storage: storage})
+var upload = multer({ storage: storage,
+    limits: {
+        fileSize: 100000
+    }
+})
 
 //Lista de usuarios
 router.get('/', function(req, res, next) {

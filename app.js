@@ -21,7 +21,7 @@ const dirNode_modules = path.join(__dirname , './node_modules');
 app.use('/css', express.static(dirNode_modules + '/bootstrap/dist/css'));
 app.use('/js', express.static(dirNode_modules + '/jquery/dist'));
 app.use('/js', express.static(dirNode_modules + '/bootstrap/dist/js'));
-
+app.use('/js', express.static(dirNode_modules + '/public/js'));
 
 hbs.registerPartials(path.join(__dirname, 'views/partials'))
 
@@ -56,8 +56,10 @@ app.use(function(req, res, next){
     res.locals.aspirante = (req.session.usuario.rolUsuario == 'Aspirante') ? true : false;
 
     //Se debe convertir el Uint8Array a un buffer antes de realizar la conversion a base64
-    var buffer = Buffer.from(req.session.usuario.fotoPerfil.data);
-    res.locals.avatar = `data:${req.session.usuario.fotoPerfil.contentType};base64,` + buffer.toString('base64')
+    if(req.session.usuario.fotoPerfil != undefined){
+      var buffer = Buffer.from(req.session.usuario.fotoPerfil.data);
+      res.locals.avatar = `data:${req.session.usuario.fotoPerfil.contentType};base64,` + buffer.toString('base64')
+    }
   }
   res.locals.mensajeExito = req.flash('mensajeExito');
   res.locals.mensajeError = req.flash('mensajeError');

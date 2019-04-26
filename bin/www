@@ -8,13 +8,6 @@
   process.env.URLDB = 'mongodb://localhost:27017/Cursos'
  }
 
- /**
-  * Key para sendgrid
-  */
- if(!process.env.SENDGRID_API_KEY){
-  process.env.SENDGRID_API_KEY = ''
- }
-
 /**
  * Module dependencies.
  */
@@ -22,6 +15,7 @@
 var app = require('../app');
 var debug = require('debug')('cursos:server');
 var http = require('http');
+
 
 /**
  * Get port from environment and store in Express.
@@ -36,6 +30,11 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
+/**
+ * Se inicializa el socket
+ */
+var io = require('socket.io')(server);
+app.set('socketio', io);
 /**
  * Listen on provided port, on all network interfaces.
  */

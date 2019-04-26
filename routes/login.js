@@ -19,6 +19,13 @@ router.post('/', function(req, res, next) {
 
         if(result){
             if(bcrypt.compareSync(req.body.pswLogin, result.pswUsuario)){
+
+                var io = req.app.get('socketio');
+
+                io.on('connection', client => { 
+                    client.broadcast.emit('mensaje', 'Ingreso el usuario ' + result.nombreUsuario);
+                 });
+
                 req.session.usuario = result;
                 res.redirect('cursos')
             }else{
