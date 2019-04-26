@@ -1,6 +1,4 @@
 var express = require('express');
-var path = require('path');
-var fs = require('fs');
 var bcrypt = require('bcryptjs');
 var router = express.Router();
 
@@ -23,8 +21,8 @@ router.post('/', function(req, res, next) {
                 var io = req.app.get('socketio');
 
                 io.on('connection', client => { 
-                    client.broadcast.emit('mensaje', 'Ingreso el usuario ' + result.nombreUsuario);
-                 });
+                    client.broadcast.emit('message', 'Ingreso el usuario ' + result.nombreUsuario);
+                });
 
                 req.session.usuario = result;
                 res.redirect('cursos')

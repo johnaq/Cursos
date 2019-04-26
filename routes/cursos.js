@@ -130,6 +130,16 @@ router.post('/cerrar', function(req, res, next) {
             estado: 0
         }, (err, result) => {
             if(result.ok){
+
+                Cursos.findOne({_id: req.body.idCurso}).exec((err, result) => { 
+                    Usuarios.findOne({_id : req.body.docente}).exec((err, result2) => {
+                        var io = req.app.get('socketio');
+                        io.on('connection', client => { 
+                            client.broadcast.emit('mensaje', `Se informa que el curso ${result.nombreCurso} se ha cerrado y se ha asignado al docente ${result2.nombreUsuario}`);
+                        });
+                    })
+                })
+
                 req.flash('mensajeExito', 'Curso cerrado correctamente');
                 res.redirect('/cursos');
             }else{
