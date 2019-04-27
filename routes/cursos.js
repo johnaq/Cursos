@@ -8,11 +8,6 @@ const Inscripciones = require('../models/inscripciones');
 
 //Lista de cursos para aspirantes y coordinadores
 router.get('/', function(req, res, next) {
-    if(!req.session.usuario){
-        req.flash('mensajeError', 'No tiene permisos')
-        res.redirect('/')
-        return;
-    }
     let session = req.session.usuario;
     if(session.rolUsuario == 'Docente'){
         //Logica para el docente

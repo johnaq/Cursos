@@ -13,6 +13,7 @@ var usuariosRouter = require('./routes/usuarios');
 var cursosRouter = require('./routes/cursos');
 var loginRouter = require('./routes/login');
 var inscripcionesRouter = require('./routes/inscripciones');
+var chatRouter = require('./routes/chat')
 
 var app = express();
 
@@ -71,7 +72,7 @@ app.use('/', loginRouter);
 app.use('/usuarios', usuariosRouter);
 app.use('/cursos', cursosRouter);
 app.use('/inscripciones', inscripcionesRouter);
-//app.use('/login', loginRouter);
+app.use('/chat', chatRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
