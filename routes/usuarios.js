@@ -10,7 +10,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 var storage = multer.memoryStorage()
 var upload = multer({ storage: storage,
     limits: {
-        fileSize: 100000
+        fileSize: 1000000
     }
 })
 
